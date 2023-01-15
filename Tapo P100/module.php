@@ -229,6 +229,7 @@ $AutoLoader->register();
         private function EncryptedRequest(string $Payload): string
         {
             if ($this->token === '') {
+                trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
                 return '';
             }
             $Url = 'http://' . $this->ReadPropertyString('Host') . '/app?token=' . $this->token;

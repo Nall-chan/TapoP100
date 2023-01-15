@@ -36,7 +36,8 @@
             "name": "Interval",
             "type": "NumberSpinner",
             "caption": "Read interval",
-            "suffix": "seconds"
+            "suffix": "seconds",
+            "minimum": 0
         },
         {
             "name": "AutoRename",
