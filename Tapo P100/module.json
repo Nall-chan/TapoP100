@@ -1,0 +1,12 @@
+{
+    "id": "{A80CDE6A-E15D-AC2A-5D39-B24BD286B0FF}",
+    "name": "Tapo P100",
+    "type": 3,
+    "vendor": "TP-Link",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "P100",
+    "url": "https://github.com/Nall-chan/TapoP100/Tapo P100"
+}

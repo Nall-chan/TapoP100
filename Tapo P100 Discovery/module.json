@@ -1,0 +1,12 @@
+{
+    "id": "{E15E901C-A97A-9805-D248-F21F8570A588}",
+    "name": "Tapo P100 Discovery",
+    "type": 5,
+    "vendor": "TP-Link",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "P100",
+    "url": "https://github.com/Nall-chan/TapoP100/P100 Discovery"
+}

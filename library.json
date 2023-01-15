@@ -1,0 +1,12 @@
+{
+    "id": "{64170223-2724-18C8-574F-CA633B0BC8C1}",
+    "name": "Tapo P100",
+    "author": "Michael Tröger",
+    "url": "https://github.com/Nall-chan/TapoP100",
+    "compatibility": {
+        "version": "6.0"
+    },
+    "version": "0.5",
+    "build": 0,
+    "date": 0
+}
