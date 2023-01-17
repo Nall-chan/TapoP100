@@ -8,7 +8,7 @@
 
 
 # tapo SmartHome <!-- omit in toc -->
-Beschreibung des Moduls.
+Einbindung der TP-Link tapo SmartHome Geräte
 
 ## Inhaltsverzeichnis <!-- omit in toc -->
 
