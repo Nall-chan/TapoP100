@@ -1,6 +1,6 @@
 {
-    "id": "{A80CDE6A-E15D-AC2A-5D39-B24BD286B0FF}",
-    "name": "tapo P100",
+    "id": "{B18B6CAA-AB46-495D-9A7A-85FA3A83113A}",
+    "name": "tapo P110",
     "type": 3,
     "vendor": "TP-Link",
     "aliases": [],
@@ -8,5 +8,5 @@
     "childRequirements": [],
     "implemented": [],
     "prefix": "TAPOSH",
-    "url": "https://github.com/Nall-chan/TapoP100/Tapo P100"
+    "url": "https://github.com/Nall-chan/TapoP100/Tapo P110"
 }

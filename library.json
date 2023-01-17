@@ -1,12 +1,12 @@
 {
     "id": "{64170223-2724-18C8-574F-CA633B0BC8C1}",
-    "name": "Tapo P100",
+    "name": "tapo SmartHome",
     "author": "Michael Tröger",
-    "url": "https://github.com/Nall-chan/TapoP100",
+    "url": "https://github.com/Nall-chan/TapoSmartHome",
     "compatibility": {
         "version": "6.0"
     },
-    "version": "0.5",
-    "build": 0,
-    "date": 0
+    "version": "1.0",
+    "build": 100,
+    "date": 1673972765
 }

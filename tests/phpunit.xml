@@ -5,7 +5,7 @@
     </php>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">../TAPOP100</directory>
+            <directory suffix=".php">../tapoSmartHome</directory>
         </whitelist>
     </filter>
 </phpunit>

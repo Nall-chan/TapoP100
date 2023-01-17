@@ -11,13 +11,13 @@ class LibraryValidationTest extends TestCaseSymconValidation
         $this->validateLibrary(__DIR__ . '/..');
     }
 
-    public function testValidateDevice(): void
+    public function testValidateP100(): void
     {
         $this->validateModule(__DIR__ . '/../Tapo P100');
     }
 
-    public function testValidateConfigurator(): void
+    public function testValidateP110(): void
     {
-        $this->validateModule(__DIR__ . '/../Tapo P100 Discovery');
+        $this->validateModule(__DIR__ . '/../Tapo P110');
     }
 }

@@ -11,15 +11,26 @@ eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR_
 $AutoLoader = new AutoLoaderTapoP100PHPSecLib('Crypt/Random');
 $AutoLoader->register();
 
-    /**
-     * @property string $terminalUUID
-     * @property string $privateKey
-     * @property string $publicKey
-     * @property string $token
-     * @property string $cookie
-     * @property string $TpLinkCipherIV
-     * @property string $TpLinkCipherKey
-     */
+/**
+ * TapoP100 Klasse für die Anbindung von TP-Link tapo P100 / P110 Smart Sockets.
+ * Erweitert IPSModule.
+ *
+ * @author        Michael Tröger <micha@nall-chan.net>
+ * @copyright     2023 Michael Tröger
+ * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+ *
+ * @version       1.00
+ *
+ * @example <b>Ohne</b>
+ *
+ * @property string $terminalUUID
+ * @property string $privateKey
+ * @property string $publicKey
+ * @property string $token
+ * @property string $cookie
+ * @property string $TpLinkCipherIV
+ * @property string $TpLinkCipherKey
+ */
     class TapoP100 extends IPSModule
     {
         use \TapoP100\BufferHelper;
@@ -27,6 +38,13 @@ $AutoLoader->register();
         use \TapoP100\Semaphore;
         use \TapoP100\VariableProfileHelper;
 
+        protected static $ErrorCodes = [
+            0    => 'Success',
+            -1010=> 'Invalid Public Key Length',
+            -1501=> 'Invalid Request or Credentials',
+            1002 => 'Incorrect Request',
+            -1003=> 'JSON formatting error '
+        ];
         public function Create()
         {
             //Never delete this line!
@@ -37,7 +55,14 @@ $AutoLoader->register();
             $this->RegisterPropertyString('Password', '');
             $this->RegisterPropertyInteger('Interval', 5);
             $this->RegisterPropertyBoolean('AutoRename', true);
-            $this->RegisterTimer('RequestState', 0, 'P100_RequestState($_IPS[\'TARGET\']);');
+            $this->RegisterTimer('RequestState', 0, 'TAPOSH_RequestState($_IPS[\'TARGET\']);');
+            $this->terminalUUID = '';
+            $this->privateKey = '';
+            $this->publicKey = '';
+            $this->token = '';
+            $this->cookie = '';
+            $this->TpLinkCipherKey = '';
+            $this->TpLinkCipherIV = '';
         }
 
         public function Destroy()
@@ -53,12 +78,15 @@ $AutoLoader->register();
             parent::ApplyChanges();
             $this->RegisterVariableBoolean('State', $this->Translate('State'), '~Switch');
             $this->EnableAction('State');
+            $this->SetSummary($this->ReadPropertyString('Host'));
             $this->terminalUUID = $this->guidv4(\phpseclib\Crypt\Random::string(16));
             $Key = (new \phpseclib\Crypt\RSA())->createKey(1024);
             $this->privateKey = $Key['privatekey'];
             $this->publicKey = $Key['publickey'];
             $this->token = '';
             $this->cookie = '';
+            $this->TpLinkCipherKey = '';
+            $this->TpLinkCipherIV = '';
 
             if ($this->ReadPropertyBoolean('Open')) {
                 if ($this->ReadPropertyString('Host') != '') {
@@ -83,7 +111,7 @@ $AutoLoader->register();
         {
             switch ($Ident) {
                 case 'State':
-                    return $this->SwitchMode($Value);
+                    return $this->SwitchMode((bool) $Value);
             }
         }
 
@@ -111,7 +139,7 @@ $AutoLoader->register();
             }
             $json = json_decode($decryptedResponse, true);
             if ($json['error_code'] != 0) {
-                trigger_error('error_code:' . $json['error_code'], E_USER_NOTICE);
+                trigger_error(self::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
                 return false;
             }
 
@@ -119,7 +147,6 @@ $AutoLoader->register();
             if ($this->ReadPropertyBoolean('AutoRename') && (IPS_GetName($this->InstanceID)) != $Name) {
                 IPS_SetName($this->InstanceID, $Name);
             }
-
             return $json['result'];
         }
 
@@ -141,7 +168,7 @@ $AutoLoader->register();
             }
             $json = json_decode($decryptedResponse, true);
             if ($json['error_code'] != 0) {
-                trigger_error('error_code:' . $json['error_code'], E_USER_NOTICE);
+                trigger_error(self::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
                 return false;
             }
             $this->SetValue('State', $State);
@@ -170,11 +197,32 @@ $AutoLoader->register();
             }
             $json = json_decode($decryptedResponse, true);
             if ($json['error_code'] != 0) {
-                trigger_error('error_code:' . $json['error_code'], E_USER_NOTICE);
+                trigger_error(self::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
                 return false;
             }
             $this->SetValue('State', $State);
             return true;
+        }
+
+        protected function EncryptedRequest(string $Payload): string
+        {
+            if ($this->token === '') {
+                trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
+                return '';
+            }
+            $Url = 'http://' . $this->ReadPropertyString('Host') . '/app?token=' . $this->token;
+            $tp_link_cipher = new \TapoP100\TpLinkCipher($this->TpLinkCipherKey, $this->TpLinkCipherIV);
+            $EncryptedPayload = $tp_link_cipher->encrypt($Payload);
+            $SecurePassthroughPayload = json_encode([
+                'method'=> 'securePassthrough',
+                'params'=> [
+                    'request'=> $EncryptedPayload
+                ]]);
+            $Result = $this->CurlRequest($Url, $SecurePassthroughPayload);
+            if ($Result === '') {
+                return '';
+            }
+            return $tp_link_cipher->decrypt(json_decode($Result, true)['result']['response']);
         }
 
         private function Init(): bool
@@ -222,29 +270,8 @@ $AutoLoader->register();
             if ($json['error_code'] == 0) {
                 return $json['result']['token'];
             }
-            trigger_error('error_code:' . $json['error_code'], E_USER_NOTICE);
+            trigger_error(self::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
             return '';
-        }
-
-        private function EncryptedRequest(string $Payload): string
-        {
-            if ($this->token === '') {
-                trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
-                return '';
-            }
-            $Url = 'http://' . $this->ReadPropertyString('Host') . '/app?token=' . $this->token;
-            $tp_link_cipher = new \TapoP100\TpLinkCipher($this->TpLinkCipherKey, $this->TpLinkCipherIV);
-            $EncryptedPayload = $tp_link_cipher->encrypt($Payload);
-            $SecurePassthroughPayload = json_encode([
-                'method'=> 'securePassthrough',
-                'params'=> [
-                    'request'=> $EncryptedPayload
-                ]]);
-            $Result = $this->CurlRequest($Url, $SecurePassthroughPayload);
-            if ($Result === '') {
-                return '';
-            }
-            return $tp_link_cipher->decrypt(json_decode($Result, true)['result']['response']);
         }
 
         private function CurlRequest(string $Url, string $Payload): string
