@@ -11,7 +11,7 @@ require_once __DIR__ . '/../Tapo P100/module.php';
  * @copyright     2023 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.00
+ * @version       1.10
  *
  * @example <b>Ohne</b>
  *
@@ -28,8 +28,15 @@ require_once __DIR__ . '/../Tapo P100/module.php';
      public function ApplyChanges()
      {
          //Never delete this line!
+         $this->RegisterProfileInteger('Tapo.Runtime', '', '', ' minutes', 0, 0, 0);
+         $this->RegisterVariableString('today_runtime', $this->Translate('Runtime today'));
+         $this->RegisterVariableString('month_runtime', $this->Translate('Runtime month'));
+         $this->RegisterVariableInteger('today_runtime_raw', $this->Translate('Runtime today (minutes)'), 'Tapo.Runtime');
+         $this->RegisterVariableInteger('month_runtime_raw', $this->Translate('Runtime month (minutes)'), 'Tapo.Runtime');
+         $this->RegisterVariableFloat('today_energy', $this->Translate('Energy today'), '~Electricity.Wh');
+         $this->RegisterVariableFloat('month_energy', $this->Translate('Energy month'), '~Electricity.Wh');
+         $this->RegisterVariableFloat('current_power', $this->Translate('Current power'), '~Watt');
          parent::ApplyChanges();
-//         $this->RegisterVariableBoolean('State', $this->Translate('State'), '~Switch');
      }
 
      public function RequestState()
@@ -37,8 +44,15 @@ require_once __DIR__ . '/../Tapo P100/module.php';
          if (parent::RequestState()) {
              $Result = $this->GetEnergyUsage();
              if (is_array($Result)) {
-                 //$this->SetValue('State', $Result['device_on']);
-                 return true;
+                 $this->SetValue('today_runtime_raw', $Result['today_runtime']);
+                 $this->SetValue('month_runtime_raw', $Result['month_runtime']);
+
+                 $this->SetValue('today_runtime', sprintf(date('H \%\s i \%\s', $Result['today_runtime'] * 60), $this->Translate('hours'), $this->Translate('minutes')));
+                 $this->SetValue('month_runtime', sprintf(date('j \%\s H \%\s i \%\s', $Result['month_runtime'] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
+                 $this->SetValue('today_energy', $Result['today_energy']); //'~Electricity.Wh'
+                $this->SetValue('month_energy', $Result['month_energy']); // '~Electricity.Wh'
+                $this->SetValue('current_power', ($Result['current_power'] / 1000)); // '~Watt'
+                return true;
              }
          }
          return false;

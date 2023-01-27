@@ -19,7 +19,7 @@ $AutoLoader->register();
  * @copyright     2023 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.00
+ * @version       1.10
  *
  * @example <b>Ohne</b>
  *
