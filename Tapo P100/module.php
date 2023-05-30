@@ -54,7 +54,7 @@ $AutoLoader->register();
             $this->RegisterPropertyString('Username', '');
             $this->RegisterPropertyString('Password', '');
             $this->RegisterPropertyInteger('Interval', 5);
-            $this->RegisterPropertyBoolean('AutoRename', true);
+            $this->RegisterPropertyBoolean('AutoRename', false);
             $this->RegisterTimer('RequestState', 0, 'TAPOSH_RequestState($_IPS[\'TARGET\']);');
             $this->terminalUUID = '';
             $this->privateKey = '';
