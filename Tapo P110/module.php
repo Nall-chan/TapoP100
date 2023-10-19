@@ -68,7 +68,7 @@ require_once __DIR__ . '/../Tapo P100/module.php';
          $decryptedResponse = $this->EncryptedRequest($Payload);
          $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
          if ($decryptedResponse === '') {
-             return [];
+             return false;
          }
          $json = json_decode($decryptedResponse, true);
          if ($json['error_code'] != 0) {
