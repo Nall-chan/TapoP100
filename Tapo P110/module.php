@@ -47,8 +47,8 @@ require_once __DIR__ . '/../Tapo P100/module.php';
                  $this->SetValue('today_runtime_raw', $Result['today_runtime']);
                  $this->SetValue('month_runtime_raw', $Result['month_runtime']);
 
-                 $this->SetValue('today_runtime', sprintf(date('H \%\s i \%\s', $Result['today_runtime'] * 60), $this->Translate('hours'), $this->Translate('minutes')));
-                 $this->SetValue('month_runtime', sprintf(date('j \%\s H \%\s i \%\s', $Result['month_runtime'] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
+                 $this->SetValue('today_runtime', sprintf(gmdate('H \%\s i \%\s', $Result['today_runtime'] * 60), $this->Translate('hours'), $this->Translate('minutes')));
+                 $this->SetValue('month_runtime', sprintf(gmdate('z \%\s H \%\s i \%\s', $Result['month_runtime'] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
                  $this->SetValue('today_energy', $Result['today_energy']); //'~Electricity.Wh'
                 $this->SetValue('month_energy', $Result['month_energy']); // '~Electricity.Wh'
                 $this->SetValue('current_power', ($Result['current_power'] / 1000)); // '~Watt'
