@@ -247,6 +247,10 @@ $AutoLoader->register();
                 trigger_error($msg, E_USER_NOTICE);
                 return '';
             }
+
+            if ($this->GetStatus() != IS_ACTIVE ) {
+                $this->SetStatus(IS_ACTIVE);
+            }
             return $tp_link_cipher->decrypt($json['result']['response']);
         }
 
@@ -319,7 +323,9 @@ $AutoLoader->register();
             curl_close($ch);
             if ($HttpCode == 0) {
                 $this->SendDebug('Not connected', '', 0);
-                $this->SetStatus(201);
+                if ($this->GetStatus() != 201 ) {
+                    $this->SetStatus(201);
+                }
                 return '';
             } elseif ($HttpCode == 400) {
                 $this->SendDebug('Bad Request', $HttpCode, 0);
