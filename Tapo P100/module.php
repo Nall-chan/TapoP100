@@ -225,12 +225,12 @@ $AutoLoader->register();
             }
             $json = json_decode($Result, true);
 
-            if ($json['error_code'] == 9999){
+            if ($json['error_code'] == 9999) {
                 // Session Timeout, try to reconnect
                 $this->SendDebug('Session Timeout', '', 0);
-                if (!$this->Init()){
-                    if ($this->GetStatus() != 201 ) {
-                        $this->SetStatus(201);
+                if (!$this->Init()) {
+                    if ($this->GetStatus() != IS_EBASE + 1) {
+                        $this->SetStatus(IS_EBASE + 1);
                     }
                 } else {
                     $this->SetStatus(IS_ACTIVE);
@@ -239,8 +239,8 @@ $AutoLoader->register();
             }
 
             if ($json['error_code'] != 0) {
-                if ( array_key_exists($json['error_code'], self::$ErrorCodes) ){
-                    $msg = self::$ErrorCodes[$json['error_code']].'(error_code:'.$json['error_code'].')';
+                if (array_key_exists($json['error_code'], self::$ErrorCodes)) {
+                    $msg = self::$ErrorCodes[$json['error_code']];
                 } else {
                     $msg = $Result;
                 }
@@ -248,7 +248,7 @@ $AutoLoader->register();
                 return '';
             }
 
-            if ($this->GetStatus() != IS_ACTIVE ) {
+            if ($this->GetStatus() != IS_ACTIVE) {
                 $this->SetStatus(IS_ACTIVE);
             }
             return $tp_link_cipher->decrypt($json['result']['response']);
@@ -323,8 +323,8 @@ $AutoLoader->register();
             curl_close($ch);
             if ($HttpCode == 0) {
                 $this->SendDebug('Not connected', '', 0);
-                if ($this->GetStatus() != 201 ) {
-                    $this->SetStatus(201);
+                if ($this->GetStatus() != IS_EBASE + 1) {
+                    $this->SetStatus(IS_EBASE + 1);
                 }
                 return '';
             } elseif ($HttpCode == 400) {
