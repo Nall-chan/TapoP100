@@ -43,7 +43,8 @@ $AutoLoader->register();
             -1010=> 'Invalid Public Key Length',
             -1501=> 'Invalid Request or Credentials',
             1002 => 'Incorrect Request',
-            -1003=> 'JSON formatting error '
+            -1003=> 'JSON formatting error ',
+            9999 => 'Session Timeout'
         ];
         public function Create()
         {
@@ -135,7 +136,7 @@ $AutoLoader->register();
             $decryptedResponse = $this->EncryptedRequest($Payload);
             $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
             if ($decryptedResponse === '') {
-                return [];
+                return false;
             }
             $json = json_decode($decryptedResponse, true);
             if ($json['error_code'] != 0) {
@@ -222,7 +223,35 @@ $AutoLoader->register();
             if ($Result === '') {
                 return '';
             }
-            return $tp_link_cipher->decrypt(json_decode($Result, true)['result']['response']);
+            $json = json_decode($Result, true);
+
+            if ($json['error_code'] == 9999) {
+                // Session Timeout, try to reconnect
+                $this->SendDebug('Session Timeout', '', 0);
+                if (!$this->Init()) {
+                    if ($this->GetStatus() != IS_EBASE + 1) {
+                        $this->SetStatus(IS_EBASE + 1);
+                    }
+                } else {
+                    $this->SetStatus(IS_ACTIVE);
+                }
+                return '';
+            }
+
+            if ($json['error_code'] != 0) {
+                if (array_key_exists($json['error_code'], self::$ErrorCodes)) {
+                    $msg = self::$ErrorCodes[$json['error_code']];
+                } else {
+                    $msg = $Result;
+                }
+                trigger_error($msg, E_USER_NOTICE);
+                return '';
+            }
+
+            if ($this->GetStatus() != IS_ACTIVE) {
+                $this->SetStatus(IS_ACTIVE);
+            }
+            return $tp_link_cipher->decrypt($json['result']['response']);
         }
 
         private function Init(): bool
@@ -294,6 +323,9 @@ $AutoLoader->register();
             curl_close($ch);
             if ($HttpCode == 0) {
                 $this->SendDebug('Not connected', '', 0);
+                if ($this->GetStatus() != IS_EBASE + 1) {
+                    $this->SetStatus(IS_EBASE + 1);
+                }
                 return '';
             } elseif ($HttpCode == 400) {
                 $this->SendDebug('Bad Request', $HttpCode, 0);
