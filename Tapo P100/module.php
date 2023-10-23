@@ -3,34 +3,36 @@
 declare(strict_types=1);
 
 namespace {
-eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/BufferHelper.php') . '}');
-eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/DebugHelper.php') . '}');
-eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/SemaphoreHelper.php') . '}');
-eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/VariableProfileHelper.php') . '}');
+    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/BufferHelper.php') . '}');
+    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/DebugHelper.php') . '}');
+    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/SemaphoreHelper.php') . '}');
+    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/../libs/helper/VariableProfileHelper.php') . '}');
 
-$AutoLoader = new AutoLoaderTapoP100PHPSecLib('Crypt/Random');
-$AutoLoader->register();
+    $AutoLoader = new AutoLoaderTapoP100PHPSecLib('Crypt/Random');
+    $AutoLoader->register();
 
-/**
- * TapoP100 Klasse für die Anbindung von TP-Link tapo P100 / P110 Smart Sockets.
- * Erweitert IPSModule.
- *
- * @author        Michael Tröger <micha@nall-chan.net>
- * @copyright     2023 Michael Tröger
- * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
- *
- * @version       1.10
- *
- * @example <b>Ohne</b>
- *
- * @property string $terminalUUID
- * @property string $privateKey
- * @property string $publicKey
- * @property string $token
- * @property string $cookie
- * @property string $TpLinkCipherIV
- * @property string $TpLinkCipherKey
- */
+    /**
+     * TapoP100 Klasse für die Anbindung von TP-Link tapo P100 / P110 Smart Sockets.
+     * Erweitert IPSModule.
+     *
+     * @author        Michael Tröger <micha@nall-chan.net>
+     * @copyright     2023 Michael Tröger
+     * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+     *
+     * @version       1.20
+     *
+     * @example <b>Ohne</b>
+     *
+     * @property string $terminalUUID
+     * @property string $privateKey
+     * @property string $publicKey
+     * @property string $token
+     * @property string $cookie
+     * @property string $TpLinkCipherIV
+     * @property string $TpLinkCipherKey
+     *
+     * @method void RegisterProfileInteger(string $Name, string $Icon, string $Prefix, string $Suffix, int $MinValue, int $MaxValue, float $StepSize)
+     */
     class TapoP100 extends IPSModule
     {
         use \TapoP100\BufferHelper;
@@ -435,7 +437,6 @@ $AutoLoader->register();
 }
 
 namespace TapoP100 {
-
     class TpLinkCipher
     {
         private $key;

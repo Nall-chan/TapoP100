@@ -1,11 +1,11 @@
 [![SDK](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.10-blue.svg)](https://community.symcon.de/t/modulk-tp-link-tapo-p100-p110/131865)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.20-blue.svg)](https://community.symcon.de/t/modulk-tp-link-tapo-p100-p110/131865)
 [![Version](https://img.shields.io/badge/Symcon%20Version-6.1%20%3E-green.svg)](https://www.symcon.de/service/dokumentation/installation/migrationen/v60-v61-q1-2022/)  
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Check Style](https://github.com/Nall-chan/SSHClient/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)
 [![Run Tests](https://github.com/Nall-chan/SSHClient/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)  
-[![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)  
-
+[![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)
+[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
 
 # tapo SmartHome <!-- omit in toc -->
 Einbindung der TP-Link tapo SmartHome Geräte
@@ -87,11 +87,13 @@ boolean TAPOSH_RequestState(integer $InstanzID);
 ```
 ---  
 ``` php
-boolean TAPOSH_GetEnergyUsage(integer $InstanzID);
+array|false TAPOSH_GetDeviceInfo(integer $InstanzID);
 ```
 ---  
+
+**Nur P110 Instanzen:**
 ``` php
-array TAPOSH_GetDeviceInfo(integer $InstanzID);
+array|false TAPOSH_GetEnergyUsage(integer $InstanzID);
 ```
 
 
@@ -103,6 +105,11 @@ TODO
 
 ### 1. Changelog
 
+Version 1.20:  
+- Laufzeit wurde falsch berechnet und nicht als UTC abgelegt  
+- Session Timeout wird abgefangen und ein automatischer reconnect wird versucht
+- Fehlerbehandlung verbessert  
+  
 Version 1.10:  
 - Energiemessung von P110 ergänzt    
   
@@ -111,13 +118,11 @@ Version 1.00:
 
 ### 2. Spenden
 
-Die Library ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als Unterstützung für den Autor werden hier akzeptiert:  
+  Die Library ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als Unterstützung für den Autor werden hier akzeptiert:  
 
-  PayPal:  
-<a href="https://www.paypal.com/donate?hosted_button_id=G2SLW2MEMQZH2" target="_blank"><img src="https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_LG.gif" border="0" /></a>  
+<a href="https://www.paypal.com/donate?hosted_button_id=G2SLW2MEMQZH2" target="_blank"><img src="https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_LG.gif" border="0" /></a>
 
-  Wunschliste:  
-<a href="https://www.amazon.de/hz/wishlist/ls/YU4AI9AQT9F?ref_=wl_share" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" border="0" width="100"/></a>  
+[![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](https://www.amazon.de/hz/wishlist/ls/YU4AI9AQT9F?ref_=wl_share) 
 
 ## 10. Lizenz
 
