@@ -542,7 +542,7 @@ namespace {
             } elseif ($HttpCode == 200) {
                 return $Result;
             }
-                return '';
+            return '';
         }
 
         private function Handshake()
@@ -580,7 +580,7 @@ namespace {
             }
             $Cookie = curl_getinfo($ch, CURLINFO_COOKIELIST);
             $this->cookie = (is_array($Cookie)) ? array_shift($Cookie) : '';
-                $this->SendDebug('Handshake Result:' . $HttpCode, $Result, 0);
+            $this->SendDebug('Handshake Result:' . $HttpCode, $Result, 0);
             $json = json_decode($Result, true);
             if ($json['error_code'] != 0) {
                 return $json['error_code'];
