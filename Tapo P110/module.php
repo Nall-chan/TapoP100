@@ -64,7 +64,7 @@ class TapoP110 extends TapoP100
             'requestTimeMils'=> 0
         ]);
         $this->SendDebug(__FUNCTION__, $Payload, 0);
-        $decryptedResponse = $this->EncryptedRequest($Payload);
+        $decryptedResponse = $this->SendRequest($Payload);
         $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
         if ($decryptedResponse === '') {
             return false;
