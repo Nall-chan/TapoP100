@@ -11,7 +11,7 @@ require_once __DIR__ . '/../Tapo P100/module.php';
  * @copyright     2023 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.20
+ * @version       1.30
  *
  * @example <b>Ohne</b>
  *

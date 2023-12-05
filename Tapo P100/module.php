@@ -19,7 +19,7 @@ namespace {
      * @copyright     2023 Michael Tröger
      * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
      *
-     * @version       1.20
+     * @version       1.30
      *
      * @example <b>Ohne</b>
      *
@@ -30,8 +30,13 @@ namespace {
      * @property string $cookie
      * @property string $TpLinkCipherIV
      * @property string $TpLinkCipherKey
+     * @property string $KlapLocalSeed
+     * @property string $KlapRemoteSeed
+     * @property string $KlapUserHash
+     * @property string $KlapSequenz
      *
      * @method void RegisterProfileInteger(string $Name, string $Icon, string $Prefix, string $Suffix, int $MinValue, int $MaxValue, float $StepSize)
+     * @method bool SendDebug(string $Message, mixed $Data, int $Format)
      */
     class TapoP100 extends IPSModule
     {
@@ -45,6 +50,7 @@ namespace {
             -1010=> 'Invalid Public Key Length',
             -1501=> 'Invalid Request or Credentials',
             1002 => 'Incorrect Request',
+            1003 => 'Invalid Protocol',
             -1003=> 'JSON formatting error ',
             9999 => 'Session Timeout'
         ];
@@ -66,6 +72,10 @@ namespace {
             $this->cookie = '';
             $this->TpLinkCipherKey = '';
             $this->TpLinkCipherIV = '';
+            $this->KlapLocalSeed = '';
+            $this->KlapRemoteSeed = '';
+            $this->KlapUserHash = '';
+            $this->KlapSequenz = null;
         }
 
         public function Destroy()
@@ -90,6 +100,10 @@ namespace {
             $this->cookie = '';
             $this->TpLinkCipherKey = '';
             $this->TpLinkCipherIV = '';
+            $this->KlapLocalSeed = '';
+            $this->KlapRemoteSeed = '';
+            $this->KlapUserHash = '';
+            $this->KlapSequenz = null;
 
             if ($this->ReadPropertyBoolean('Open')) {
                 if ($this->ReadPropertyString('Host') != '') {
@@ -135,7 +149,7 @@ namespace {
                 'requestTimeMils'=> 0
             ]);
             $this->SendDebug(__FUNCTION__, $Payload, 0);
-            $decryptedResponse = $this->EncryptedRequest($Payload);
+            $decryptedResponse = $this->SendRequest($Payload);
             $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
             if ($decryptedResponse === '') {
                 return false;
@@ -164,7 +178,7 @@ namespace {
                 'terminalUUID'   => $this->terminalUUID
             ]);
             $this->SendDebug(__FUNCTION__, $Payload, 0);
-            $decryptedResponse = $this->EncryptedRequest($Payload);
+            $decryptedResponse = $this->SendRequest($Payload);
             $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
             if ($decryptedResponse === '') {
                 return false;
@@ -193,7 +207,7 @@ namespace {
                 'terminalUUID'   => $this->terminalUUID
             ]);
             $this->SendDebug(__FUNCTION__, $Payload, 0);
-            $decryptedResponse = $this->EncryptedRequest($Payload);
+            $decryptedResponse = $this->SendRequest($Payload);
             $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
             if ($decryptedResponse === '') {
                 return false;
@@ -205,6 +219,13 @@ namespace {
             }
             $this->SetValue('State', $State);
             return true;
+        }
+        protected function SendRequest(string $Payload): string
+        {
+            if ($this->KlapRemoteSeed == '') {
+                return $this->EncryptedRequest($Payload);
+            }
+            return $this->KlapEncryptedRequest($Payload);
         }
 
         protected function EncryptedRequest(string $Payload): string
@@ -255,10 +276,199 @@ namespace {
             }
             return $tp_link_cipher->decrypt($json['result']['response']);
         }
+        private function GenerateKlapAuthHash(string $Username, string $Password): string
+        {
+            return hash('sha256', sha1(mb_convert_encoding($Username, 'UTF-8'), true) .
+                    sha1(mb_convert_encoding($Password, 'UTF-8'), true), true);
+            /*return md5(md5(mb_convert_encoding($Username, 'UTF-8'), true) .
+                md5(mb_convert_encoding($Password, 'UTF-8'), true), true);
+             */
+        }
+        private function InitKlap(): bool
+        {
+            $UserHash = $this->GenerateKlapAuthHash(
+                $this->ReadPropertyString('Username'),
+                $this->ReadPropertyString('Password')
+            );
 
+            $auth_owner = md5(mb_convert_encoding($this->ReadPropertyString('Username'), 'UTF-8'));
+
+            $Url = 'http://' . $this->ReadPropertyString('Host') . '/app/handshake1';
+
+            $Payload = random_bytes(16);
+            $this->SendDebug('Init Klap', $Payload, 0);
+            $this->cookie = '';
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $Url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $Payload);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
+            curl_setopt($ch, CURLOPT_COOKIEFILE, '');
+            //curl_setopt($ch, CURLOPT_HEADER, true);
+            $Result = curl_exec($ch);
+            $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            $this->CurlDebug($HttpCode);
+            if ($HttpCode != 200) {
+                $this->SendDebug('Init Init Result:' . $HttpCode, $Result, 0);
+                return false;
+            }
+            $Cookie = curl_getinfo($ch, CURLINFO_COOKIELIST);
+            $this->cookie = (is_array($Cookie)) ? array_shift($Cookie) : '';
+            $this->SendDebug('Init Init Result:' . $HttpCode, $Result, 0);
+            $RemoteSeed = substr($Result, 0, 16);
+            $ServerHash = substr($Result, 16);
+            $UserTest = hash('sha256', $Payload . $RemoteSeed . $UserHash, true);
+            $this->SendDebug('Config User', $UserTest, 0);
+            if ($ServerHash == $UserTest) {
+                $this->KlapLocalSeed = $Payload;
+                $this->KlapRemoteSeed = $RemoteSeed;
+                $this->KlapUserHash = $UserHash;
+                return true;
+            }
+            $UserHash = $this->GenerateKlapAuthHash(
+                'kasa@tp-link.net',
+                'kasaSetup'
+            );
+            $UserTest = hash('sha256', $Payload . $RemoteSeed . $UserHash, true);
+            $this->SendDebug('Generic User', $UserTest, 0);
+            if ($ServerHash == $UserTest) {
+                $this->KlapLocalSeed = $Payload;
+                $this->KlapRemoteSeed = $RemoteSeed;
+                $this->KlapUserHash = $UserHash;
+                return true;
+            }
+            $UserHash = $this->GenerateKlapAuthHash(
+                '',
+                ''
+            );
+            $UserTest = hash('sha256', $Payload . $RemoteSeed . $UserHash, true);
+            $this->SendDebug('Empty User', $UserTest, 0);
+            if ($ServerHash == $UserTest) {
+                $this->KlapLocalSeed = $Payload;
+                $this->KlapRemoteSeed = $RemoteSeed;
+                $this->KlapUserHash = $UserHash;
+                return true;
+            }
+            return false;
+        }
+        private function HandshakeKlap(): bool
+        {
+            $Url = 'http://' . $this->ReadPropertyString('Host') . '/app/handshake2';
+            $Payload = hash('sha256', $this->KlapRemoteSeed . $this->KlapLocalSeed . $this->KlapUserHash, true);
+            $this->SendDebug('Handshake Klap', $Payload, 0);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $Url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $Payload);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
+            curl_setopt($ch, CURLOPT_COOKIELIST, $this->cookie);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            $Result = curl_exec($ch);
+            $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            $this->CurlDebug($HttpCode);
+            if ($HttpCode != 200) {
+                $this->SendDebug('Klap Handshake Result:' . $HttpCode, $Result, 0);
+                return false;
+            }
+
+            $Parts = explode("\r\n\r\n", $Result);
+            $Header = array_shift($Parts);
+            $Result = implode("\r\n\r\n", $Parts);
+
+            $this->SendDebug('Klap Handshake Header:' . $HttpCode, $Header, 0);
+            $this->SendDebug('Klap Handshake Result:' . $HttpCode, $Result, 0);
+
+            return true;
+        }
+        private function KlapEncryptedRequest(string $Payload): string
+        {
+            $TpKlapCipher = new \TapoP100\KlapCipher($this->KlapLocalSeed, $this->KlapRemoteSeed, $this->KlapUserHash, $this->KlapSequenz);
+            $EncryptedPayload = $TpKlapCipher->encrypt($Payload);
+            $this->KlapSequenz = $TpKlapCipher->getSequenz();
+            $Url = 'http://' . $this->ReadPropertyString('Host') . '/app/request?' . http_build_query(['seq'=>$this->KlapSequenz]);
+            $this->SendDebug(__FUNCTION__ . '(' . $this->KlapSequenz . ')', $EncryptedPayload, 0);
+
+            $Response = $this->CurlRequest($Url, $EncryptedPayload);
+            if ($Response === '') {
+                return '';
+            }
+            $this->SendDebug('Response', $Response, 0);
+            $decryptedResponse = $TpKlapCipher->decrypt($Response);
+            $json = json_decode($decryptedResponse, true);
+
+            if ($json['error_code'] == 9999) {
+                // Session Timeout, try to reconnect
+                $this->SendDebug('Session Timeout', '', 0);
+                if (!$this->Init()) {
+                    if ($this->GetStatus() != IS_EBASE + 1) {
+                        $this->SetStatus(IS_EBASE + 1);
+                    }
+                } else {
+                    $this->SetStatus(IS_ACTIVE);
+                }
+                return '';
+            }
+
+            if ($json['error_code'] != 0) {
+                if (array_key_exists($json['error_code'], self::$ErrorCodes)) {
+                    $msg = self::$ErrorCodes[$json['error_code']];
+                } else {
+                    $msg = $decryptedResponse;
+                }
+                trigger_error($msg, E_USER_NOTICE);
+                return '';
+            }
+
+            if ($this->GetStatus() != IS_ACTIVE) {
+                $this->SetStatus(IS_ACTIVE);
+            }
+
+            return $decryptedResponse;
+        }
+
+        private function CurlDebug(int $HttpCode): void
+        {
+            switch ($HttpCode) {
+                case 0:
+                    $this->SendDebug('Not connected', '', 0);
+                    break;
+                case  400:
+                    $this->SendDebug('Bad Request', $HttpCode, 0);
+                    break;
+                case 401:
+                    $this->SendDebug('Unauthorized Error', $HttpCode, 0);
+                    break;
+                case 404:
+                    $this->SendDebug('Not Found Error', $HttpCode, 0);
+                    break;
+            }
+        }
         private function Init(): bool
         {
             $Bytes = $this->Handshake();
+            if ($Bytes == '') {
+                return false;
+            } elseif ($Bytes === 1003) {
+                if (!$this->InitKlap()) {
+                    return false;
+                }
+                if (!$this->HandshakeKlap()) {
+                    return false;
+                }
+
+                return true;
+            } elseif (is_int($Bytes)) {
+                trigger_error(self::$ErrorCodes[$Bytes], E_USER_NOTICE);
+                return false;
+            }
             $Data = str_split($Bytes, 16);
             $this->TpLinkCipherKey = $Data[0];
             $this->TpLinkCipherIV = $Data[1];
@@ -323,26 +533,19 @@ namespace {
                 $Result = '';
             }
             curl_close($ch);
+            $this->CurlDebug($HttpCode);
             if ($HttpCode == 0) {
                 $this->SendDebug('Not connected', '', 0);
                 if ($this->GetStatus() != IS_EBASE + 1) {
                     $this->SetStatus(IS_EBASE + 1);
                 }
-                return '';
-            } elseif ($HttpCode == 400) {
-                $this->SendDebug('Bad Request', $HttpCode, 0);
-                return '';
-            } elseif ($HttpCode == 401) {
-                $this->SendDebug('Unauthorized Error', $HttpCode, 0);
-                return '';
-            } elseif ($HttpCode == 404) {
-                $this->SendDebug('Not Found Error', $HttpCode, 0);
-                return '';
+            } elseif ($HttpCode == 200) {
+                return $Result;
             }
-            return $Result;
+                return '';
         }
 
-        private function Handshake(): string
+        private function Handshake()
         {
             $Url = 'http://' . $this->ReadPropertyString('Host') . '/app';
             $Payload = json_encode([
@@ -367,27 +570,22 @@ namespace {
             curl_setopt($ch, CURLOPT_COOKIEFILE, '');
             $Result = curl_exec($ch);
             $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $this->cookie = curl_getinfo($ch, CURLINFO_COOKIELIST)[0];
+            curl_close($ch);
+            $this->CurlDebug($HttpCode);
             if (is_bool($Result)) {
                 $Result = '';
             }
-            curl_close($ch);
-            if ($HttpCode == 0) {
-                $this->SendDebug('Not connected', '', 0);
+            if ($HttpCode != 200) {
                 return '';
-            } elseif ($HttpCode == 400) {
-                $this->SendDebug('Bad Request', $HttpCode, 0);
-                return '';
-            } elseif ($HttpCode == 401) {
-                $this->SendDebug('Unauthorized Error', $HttpCode, 0);
-                return '';
-            } elseif ($HttpCode == 404) {
-                $this->SendDebug('Not Found Error', $HttpCode, 0);
-                return '';
-            } else {
-                $this->SendDebug('Handshake Result:' . $HttpCode, $Result, 0);
             }
-            $encryptedKey = json_decode($Result, true)['result']['key'];
+            $Cookie = curl_getinfo($ch, CURLINFO_COOKIELIST);
+            $this->cookie = (is_array($Cookie)) ? array_shift($Cookie) : '';
+                $this->SendDebug('Handshake Result:' . $HttpCode, $Result, 0);
+            $json = json_decode($Result, true);
+            if ($json['error_code'] != 0) {
+                return $json['error_code'];
+            }
+            $encryptedKey = $json['result']['key'];
 
             $ciphertext = base64_decode($encryptedKey);
             $rsa = new \phpseclib\Crypt\RSA();
@@ -463,8 +661,55 @@ namespace TapoP100 {
             $cipher->enablePadding();
             $cipher->setIV($this->iv);
             $cipher->setKey($this->key);
-            $pad_text = $cipher->decrypt(base64_decode($data));
-            return $pad_text;
+            $decrypted = $cipher->decrypt(base64_decode($data));
+            return $decrypted;
+        }
+    }
+}
+
+namespace TapoP100 {
+    class KlapCipher
+    {
+        private $key;
+        private $seq;
+        private $iv;
+        private $sig;
+
+        public function __construct(string $lSeed, string $rSeed, string $uHash, ?int $Sequenz)
+        {
+            $this->key = substr(hash('sha256', 'lsk' . $lSeed . $rSeed . $uHash, true), 0, 16);
+            $this->sig = substr(hash('sha256', 'ldk' . $lSeed . $rSeed . $uHash, true), 0, 28);
+            $iv = hash('sha256', 'iv' . $lSeed . $rSeed . $uHash, true);
+            if (is_null($Sequenz)) {
+                $this->seq = unpack('N', substr($iv, -4))[1];
+            } else {
+                $this->seq = $Sequenz;
+            }
+            $this->iv = substr($iv, 0, 12);
+        }
+        public function encrypt(string $data): string
+        {
+            $this->seq++;
+            $cipher = new \phpseclib\Crypt\AES('cbc');
+            $cipher->enablePadding();
+            $cipher->setIV($this->iv . pack('N', $this->seq));
+            $cipher->setKey($this->key);
+            $encrypted = $cipher->encrypt($data);
+            $signature = hash('sha256', $this->sig . pack('N', $this->seq) . $encrypted, true);
+            return $signature . $encrypted;
+        }
+        public function getSequenz(): int
+        {
+            return $this->seq;
+        }
+        public function decrypt(string $data): string
+        {
+            $cipher = new \phpseclib\Crypt\AES('cbc');
+            $cipher->enablePadding();
+            $cipher->setIV($this->iv . pack('N', $this->seq));
+            $cipher->setKey($this->key);
+            $decrypted = $cipher->decrypt(substr($data, 32));
+            return $decrypted;
         }
     }
 }
