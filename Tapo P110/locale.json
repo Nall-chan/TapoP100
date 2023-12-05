@@ -8,6 +8,7 @@
             "seconds": "Sekunden",
             "Auto rename instance": "Instanz automatisch umbenennen",
             "Not connected": "Nicht verbunden",
+            "Error on reconnect": "Fehler beim neuverbinden",
             "State": "Status",
             "Runtime today": "Laufzeit Heute",
             "Runtime month": "Laufzeit Monat",

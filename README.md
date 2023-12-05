@@ -105,6 +105,13 @@ TODO
 
 ### 1. Changelog
 
+Version 1.40:
+ - Refactoring der 1.30  
+ - Neu Verbinden überarbeitet  
+ - Leseintervall wurde nicht gesetzt, wenn Gerät offline war, somit auch nie ein automatischer Reconnect wenn Gerät online ging  
+ - War der Gerätename leer und `Instanz automatisch umbenennen` aktiv, so wurde der Name der Instanz gelöscht und es war ein `Unbenanntes Objekt`  
+ - Cookie sollte sich jetzt automatisch verlängern und nicht mehr statisch sein (Errorcode 9999)
+
 Version 1.30:
  - Neue Verschlüsselung wird unterstützt
 

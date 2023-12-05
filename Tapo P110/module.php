@@ -11,17 +11,10 @@ require_once __DIR__ . '/../Tapo P100/module.php';
  * @copyright     2023 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.30
+ * @version       1.40
  *
  * @example <b>Ohne</b>
  *
- * @property string $terminalUUID
- * @property string $privateKey
- * @property string $publicKey
- * @property string $token
- * @property string $cookie
- * @property string $TpLinkCipherIV
- * @property string $TpLinkCipherKey
  */
 class TapoP110 extends TapoP100
 {
@@ -48,9 +41,9 @@ class TapoP110 extends TapoP100
                 $this->SetValue('month_runtime_raw', $Result['month_runtime']);
                 $this->SetValue('today_runtime', sprintf(gmdate('H \%\s i \%\s', $Result['today_runtime'] * 60), $this->Translate('hours'), $this->Translate('minutes')));
                 $this->SetValue('month_runtime', sprintf(gmdate('z \%\s H \%\s i \%\s', $Result['month_runtime'] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
-                $this->SetValue('today_energy', $Result['today_energy']); //'~Electricity.Wh'
-                $this->SetValue('month_energy', $Result['month_energy']); // '~Electricity.Wh'
-                $this->SetValue('current_power', ($Result['current_power'] / 1000)); // '~Watt'
+                $this->SetValue('today_energy', $Result['today_energy']);
+                $this->SetValue('month_energy', $Result['month_energy']);
+                $this->SetValue('current_power', ($Result['current_power'] / 1000));
                 return true;
             }
         }
@@ -59,17 +52,17 @@ class TapoP110 extends TapoP100
 
     public function GetEnergyUsage()
     {
-        $Payload = json_encode([
+        $Request = json_encode([
             'method'         => 'get_energy_usage',
             'requestTimeMils'=> 0
         ]);
-        $this->SendDebug(__FUNCTION__, $Payload, 0);
-        $decryptedResponse = $this->SendRequest($Payload);
-        $this->SendDebug(__FUNCTION__ . ' Result', $decryptedResponse, 0);
-        if ($decryptedResponse === '') {
+        $this->SendDebug(__FUNCTION__, $Request, 0);
+        $Response = $this->SendRequest($Request);
+        $this->SendDebug(__FUNCTION__ . ' Result', $Response, 0);
+        if ($Response === '') {
             return false;
         }
-        $json = json_decode($decryptedResponse, true);
+        $json = json_decode($Response, true);
         if ($json['error_code'] != 0) {
             trigger_error(self::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
             return false;
