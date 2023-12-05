@@ -245,7 +245,7 @@ namespace {
             $this->cookie = '';
             $Result = $this->CurlRequest($Url, $Payload, true);
             $this->SendDebug('Init Klap Result', $Result, 0);
-            if ($Result == '') {
+            if ($Result === false) {
                 return false;
             }
             $RemoteSeed = substr($Result, 0, 16);
@@ -292,7 +292,7 @@ namespace {
             $this->SendDebug('Handshake Klap', $Payload, 0);
             $Result = $this->CurlRequest($Url, $Payload, true);
             $this->SendDebug('Klap Handshake Result', $Result, 0);
-            return  $Result != '';
+            return  $Result !== false;
         }
 
         private function KlapEncryptedRequest(string $Payload): string
@@ -310,7 +310,7 @@ namespace {
             $Url = 'http://' . $this->ReadPropertyString('Host') . '/app/request?' . http_build_query(['seq'=>$this->KlapSequenz]);
             $this->SendDebug(__FUNCTION__ . '(' . $this->KlapSequenz . ')', $EncryptedPayload, 0);
             $Result = $this->CurlRequest($Url, $EncryptedPayload);
-            if ($Result === '') {
+            if ($Result === false) {
                 if (!$this->Init()) {
                     trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
                     $this->SetStatus(IS_EBASE + 1);
@@ -386,7 +386,7 @@ namespace {
             $this->cookie = '';
             $Result = $this->CurlRequest($Url, $Payload, true);
             $this->SendDebug('Handshake Result', $Result, 0);
-            if ($Result == '') {
+            if ($Result === false) {
                 return false;
             }
             $json = json_decode($Result, true);
@@ -424,7 +424,7 @@ namespace {
                     'request'=> $EncryptedPayload
                 ]]);
             $Result = $this->CurlRequest($Url, $SecurePassthroughPayload);
-            if ($Result === '') {
+            if ($Result === false) {
                 return false;
             }
             $json = json_decode($tp_link_cipher->decrypt(json_decode($Result, true)['result']['response']), true);
@@ -448,7 +448,7 @@ namespace {
                     'request'=> $EncryptedPayload
                 ]]);
             $Result = $this->CurlRequest($Url, $SecurePassthroughPayload);
-            if ($Result === '') {
+            if ($Result === false) {
                 return '';
             }
             $this->SendDebug('Response', $Result, 0);
@@ -476,7 +476,7 @@ namespace {
             return $tp_link_cipher->decrypt($json['result']['response']);
         }
 
-        private function CurlRequest(string $Url, string $Payload, bool $noError = false): string
+        private function CurlRequest(string $Url, string $Payload, bool $noError = false)
         {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $Url);
@@ -489,9 +489,6 @@ namespace {
             curl_setopt($ch, CURLOPT_COOKIELIST, $this->cookie);
             $Result = curl_exec($ch);
             $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (is_bool($Result)) {
-                $Result = '';
-            }
             curl_close($ch);
             $this->CurlDebug($HttpCode);
             if ($HttpCode == 200) {
@@ -502,7 +499,7 @@ namespace {
             if (($HttpCode == 0) && (!$noError)) {
                 $this->SetStatus(IS_EBASE + 1);
             }
-            return '';
+            return false;
         }
 
         private function CurlDebug(int $HttpCode): void
