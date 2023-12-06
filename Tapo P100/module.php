@@ -489,10 +489,10 @@ namespace {
             curl_setopt($ch, CURLOPT_COOKIELIST, $this->cookie);
             $Result = curl_exec($ch);
             $HttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $Cookie = curl_getinfo($ch, CURLINFO_COOKIELIST);
             curl_close($ch);
             $this->CurlDebug($HttpCode);
             if ($HttpCode == 200) {
-                $Cookie = curl_getinfo($ch, CURLINFO_COOKIELIST);
                 $this->cookie = (is_array($Cookie)) ? array_shift($Cookie) : '';
                 return $Result;
             }
