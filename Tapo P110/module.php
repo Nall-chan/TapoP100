@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-require_once __DIR__ . '/../Tapo P100/module.php';
+require_once dirname(__DIR__) . '/Tapo P100/module.php';
 
 /**
  * TapoP110 Klasse für die Anbindung von TP-Link tapo P100 / P110 Smart Sockets.
@@ -21,14 +21,14 @@ class TapoP110 extends TapoP100
     public function ApplyChanges()
     {
         //Never delete this line!
-        $this->RegisterProfileInteger('Tapo.Runtime', '', '', ' minutes', 0, 0, 0);
-        $this->RegisterVariableString('today_runtime', $this->Translate('Runtime today'));
-        $this->RegisterVariableString('month_runtime', $this->Translate('Runtime month'));
-        $this->RegisterVariableInteger('today_runtime_raw', $this->Translate('Runtime today (minutes)'), 'Tapo.Runtime');
-        $this->RegisterVariableInteger('month_runtime_raw', $this->Translate('Runtime month (minutes)'), 'Tapo.Runtime');
-        $this->RegisterVariableFloat('today_energy', $this->Translate('Energy today'), '~Electricity.Wh');
-        $this->RegisterVariableFloat('month_energy', $this->Translate('Energy month'), '~Electricity.Wh');
-        $this->RegisterVariableFloat('current_power', $this->Translate('Current power'), '~Watt');
+        $this->RegisterProfileInteger(\TpLink\VariableProfile::Runtime, '', '', ' minutes', 0, 0, 0);
+        $this->RegisterVariableString(\TpLink\VariableIdent::today_runtime, $this->Translate('Runtime today'));
+        $this->RegisterVariableString(\TpLink\VariableIdent::month_runtime, $this->Translate('Runtime month'));
+        $this->RegisterVariableInteger(\TpLink\VariableIdent::today_runtime_raw, $this->Translate('Runtime today (minutes)'), \TpLink\VariableProfile::Runtime);
+        $this->RegisterVariableInteger(\TpLink\VariableIdent::month_runtime_raw, $this->Translate('Runtime month (minutes)'), \TpLink\VariableProfile::Runtime);
+        $this->RegisterVariableFloat(\TpLink\VariableIdent::today_energy, $this->Translate('Energy today'), '~Electricity.Wh');
+        $this->RegisterVariableFloat(\TpLink\VariableIdent::month_energy, $this->Translate('Energy month'), '~Electricity.Wh');
+        $this->RegisterVariableFloat(\TpLink\VariableIdent::current_power, $this->Translate('Current power'), '~Watt');
         parent::ApplyChanges();
     }
 
@@ -37,13 +37,13 @@ class TapoP110 extends TapoP100
         if (parent::RequestState()) {
             $Result = $this->GetEnergyUsage();
             if (is_array($Result)) {
-                $this->SetValue('today_runtime_raw', $Result['today_runtime']);
-                $this->SetValue('month_runtime_raw', $Result['month_runtime']);
-                $this->SetValue('today_runtime', sprintf(gmdate('H \%\s i \%\s', $Result['today_runtime'] * 60), $this->Translate('hours'), $this->Translate('minutes')));
-                $this->SetValue('month_runtime', sprintf(gmdate('z \%\s H \%\s i \%\s', $Result['month_runtime'] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
-                $this->SetValue('today_energy', $Result['today_energy']);
-                $this->SetValue('month_energy', $Result['month_energy']);
-                $this->SetValue('current_power', ($Result['current_power'] / 1000));
+                $this->SetValue(\TpLink\VariableIdent::today_runtime_raw, $Result[\TpLink\VariableIdent::today_runtime]);
+                $this->SetValue(\TpLink\VariableIdent::month_runtime_raw, $Result[\TpLink\VariableIdent::month_runtime]);
+                $this->SetValue(\TpLink\VariableIdent::today_runtime, sprintf(gmdate('H \%\s i \%\s', $Result[\TpLink\VariableIdent::today_runtime] * 60), $this->Translate('hours'), $this->Translate('minutes')));
+                $this->SetValue(\TpLink\VariableIdent::month_runtime, sprintf(gmdate('z \%\s H \%\s i \%\s', $Result[\TpLink\VariableIdent::month_runtime] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
+                $this->SetValue(\TpLink\VariableIdent::today_energy, $Result[\TpLink\VariableIdent::today_energy]);
+                $this->SetValue(\TpLink\VariableIdent::month_energy, $Result[\TpLink\VariableIdent::month_energy]);
+                $this->SetValue(\TpLink\VariableIdent::current_power, ($Result[\TpLink\VariableIdent::current_power] / 1000));
                 return true;
             }
         }
@@ -64,7 +64,7 @@ class TapoP110 extends TapoP100
         }
         $json = json_decode($Response, true);
         if ($json['error_code'] != 0) {
-            trigger_error(self::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
+            trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
             return false;
         }
         return $json['result'];
