@@ -48,6 +48,7 @@ namespace TpLink\Api
         public const HandshakeKlap = self::App . '/handshake2';
         public const KlapRequest = self::App . '/request?';
     }
+
     class Method
     {
         public const GetDeviceInfo = 'get_device_info';
@@ -57,12 +58,14 @@ namespace TpLink\Api
         public const Login = 'login_device';
         public const SecurePassthrough = 'securePassthrough';
     }
+
     class Param
     {
         public const DeviceOn = 'device_on';
         public const Username = 'username';
         public const Password = 'password';
     }
+
     class Result
     {
         public const Result = 'result';
@@ -71,6 +74,7 @@ namespace TpLink\Api
         public const Response = 'response';
         public const EncryptedKey = 'key';
     }
+
     class Protocol
     {
         public const Method = 'method';
@@ -87,6 +91,7 @@ namespace TpLink\Api
             -1003=> 'JSON formatting error ',
             9999 => 'Session Timeout'
         ];
+
         public static function BuildHandshakeRequest(string $publicKey): string
         {
             return json_encode([
@@ -98,6 +103,7 @@ namespace TpLink\Api
 
             ]);
         }
+
         public static function BuildRequest(string $Method, string $TerminalUUID = '', array $Params = []): string
         {
             $Request = [
@@ -114,6 +120,7 @@ namespace TpLink\Api
             return json_encode($Request);
         }
     }
+
     class TpProtocol
     {
         private const Token = 'token';
@@ -163,10 +170,12 @@ namespace TpLink
         public const month_energy = 'month_energy';
         public const current_power = 'current_power';
     }
+
     class VariableProfile
     {
         public const Runtime = 'Tapo.Runtime';
     }
+
     class TpLinkCipher
     {
         private $key;
@@ -290,6 +299,7 @@ namespace TpLink
             //Never delete this line!
             parent::Destroy();
         }
+
         public function ApplyChanges()
         {
             $this->SetTimerInterval(\TpLink\Timer::RequestState, 0);
@@ -307,6 +317,7 @@ namespace TpLink
                 $this->SetStatus(IS_INACTIVE);
             }
         }
+
         public function GetDeviceInfo()
         {
             $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::GetDeviceInfo);
@@ -335,6 +346,7 @@ namespace TpLink
             if ($this->GetStatus() != $Status) {
                 parent::SetStatus($Status);
             }
+            return true;
         }
 
         protected function SendRequest(string $Request): string
@@ -358,7 +370,8 @@ namespace TpLink
                 return $this->EncryptedRequest($Request);
             }
         }
-        protected function CurlDebug(int $HttpCode): void
+
+        protected function CurlDebug(int $HttpCode)
         {
             switch ($HttpCode) {
                 case 0:
@@ -375,6 +388,7 @@ namespace TpLink
                     break;
             }
         }
+
         private function InitBuffers()
         {
             $this->token = '';
@@ -386,6 +400,7 @@ namespace TpLink
             $this->KlapUserHash = '';
             $this->KlapSequenz = null;
         }
+
         private function Init(): bool
         {
             $Result = $this->Handshake();
@@ -437,6 +452,7 @@ namespace TpLink
             }
             return false;
         }
+
         private static function guidv4($data = null): string
         {
             // Generate 16 bytes (128 bits) of random data or use the data passed into the function.

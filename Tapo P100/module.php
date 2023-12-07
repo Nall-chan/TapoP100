@@ -31,9 +31,9 @@ class TapoP100 extends \TpLink\Device
     {
         switch ($Ident) {
             case \TpLink\VariableIdent::State:
-                return $this->SwitchMode((bool) $Value);
+                $this->SwitchMode((bool) $Value);
+                return;
         }
-        //todo errormsg
     }
 
     public function RequestState()
@@ -45,6 +45,7 @@ class TapoP100 extends \TpLink\Device
         }
         return false;
     }
+
     public function SwitchMode(bool $State): bool
     {
         $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::SetDeviceInfo, $this->terminalUUID, [\TpLink\Api\Param::DeviceOn => $State]);
@@ -96,5 +97,6 @@ class TapoP100 extends \TpLink\Device
                 $this->RequestState();
             }
         }
+        return true;
     }
 }
