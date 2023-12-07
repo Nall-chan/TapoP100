@@ -11,7 +11,7 @@ require_once dirname(__DIR__) . '/Tapo P100/module.php';
  * @copyright     2023 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.40
+ * @version       1.50
  *
  * @example <b>Ohne</b>
  *
@@ -58,7 +58,6 @@ class TapoP110 extends TapoP100
         ]);
         $this->SendDebug(__FUNCTION__, $Request, 0);
         $Response = $this->SendRequest($Request);
-        $this->SendDebug(__FUNCTION__ . ' Result', $Response, 0);
         if ($Response === '') {
             return false;
         }
