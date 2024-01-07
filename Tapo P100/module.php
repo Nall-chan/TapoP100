@@ -23,14 +23,21 @@ class TapoP100 extends \TpLink\Device
     {
         //Never delete this line!
         parent::ApplyChanges();
-        $this->RegisterVariableBoolean(\TpLink\VariableIdent::State, $this->Translate(\TpLink\VariableIdent::State), '~Switch');
-        $this->EnableAction(\TpLink\VariableIdent::State);
+
+        // Migrate Old 'State' Var to 'device_on' Var
+        $oldVar = @$this->GetIDForIdent('State');
+        if (IPS_VariableExists($oldVar)) {
+            IPS_SetIdent($oldVar, \TpLink\VariableIdent::device_on);
+        }
+
+        $this->RegisterVariableBoolean(\TpLink\VariableIdent::device_on, $this->Translate(\TpLink\VariableIdent::$DefaultIdents[\TpLink\VariableIdent::device_on][\TpLink\IPSVarName]), '~Switch');
+        $this->EnableAction(\TpLink\VariableIdent::device_on);
     }
 
     public function RequestAction($Ident, $Value)
     {
         switch ($Ident) {
-            case \TpLink\VariableIdent::State:
+            case \TpLink\VariableIdent::device_on:
                 $this->SwitchMode((bool) $Value);
                 return;
         }
@@ -40,7 +47,7 @@ class TapoP100 extends \TpLink\Device
     {
         $Result = $this->GetDeviceInfo();
         if (is_array($Result)) {
-            $this->SetValue(\TpLink\VariableIdent::State, $Result[\TpLink\Api\Result::DeviceOn]);
+            $this->SetValue(\TpLink\VariableIdent::device_on, $Result[\TpLink\VariableIdent::device_on]);
             return true;
         }
         return false;
@@ -48,19 +55,11 @@ class TapoP100 extends \TpLink\Device
 
     public function SwitchMode(bool $State): bool
     {
-        $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::SetDeviceInfo, $this->terminalUUID, [\TpLink\Api\Param::DeviceOn => $State]);
-        $this->SendDebug(__FUNCTION__, $Request, 0);
-        $Response = $this->SendRequest($Request);
-        if ($Response === '') {
-            return false;
+        if ($this->SetDeviceInfo([\TpLink\VariableIdent::device_on => $State])) {
+            $this->SetValue(\TpLink\VariableIdent::device_on, $State);
+            return true;
         }
-        $json = json_decode($Response, true);
-        if ($json[\TpLink\Api\ErrorCode] != 0) {
-            trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
-            return false;
-        }
-        $this->SetValue(\TpLink\VariableIdent::State, $State);
-        return true;
+        return false;
     }
 
     public function SwitchModeEx(bool $State, int $Delay): bool
@@ -85,7 +84,7 @@ class TapoP100 extends \TpLink\Device
             trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
             return false;
         }
-        $this->SetValue(\TpLink\VariableIdent::State, $State);
+        $this->SetValue(\TpLink\VariableIdent::device_on, $State);
         return true;
     }
 

@@ -20,4 +20,9 @@ class LibraryTest extends TestCaseSymconValidation
     {
         $this->validateModule(__DIR__ . '/../Tapo P110');
     }
+
+    public function testValidateBulb(): void
+    {
+        $this->validateModule(__DIR__ . '/../Tapo Bulb');
+    }
 }

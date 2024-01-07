@@ -1,0 +1,21 @@
+{
+    "translations": {
+        "de": {
+            "Open": "Aktiv",
+            "Username": "Benutzername",
+            "Password": "Passwort",
+            "Read interval": "Leseintervall",
+            "seconds": "Sekunden",
+            "Auto rename instance": "Instanz automatisch umbenennen",
+            "Not connected": "Nicht verbunden",
+            "Error on reconnect": "Fehler beim neuverbinden",
+            "State": "Status",
+            "Overheated": "Überhitzt",
+            "Brightness": "Helligkeit",
+            "Color temp": "Farbtemperatur",
+            "Color": "Farbe",
+            "This module contains 'phpseclib - PHP Secure Communications Library' (https://github.com/phpseclib/phpseclib)": "Dieses Modul enthält 'phpseclib - PHP Secure Communications Library' (https://github.com/phpseclib/phpseclib)",
+            "This module is free for non-commercial use,\r\nDonations in support of the author are accepted here:": "Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos,\r\nSchenkungen als Unterstützung für den Autor werden hier akzeptiert:"
+        }
+    }
+}

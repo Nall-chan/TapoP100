@@ -22,13 +22,13 @@ class TapoP110 extends TapoP100
     {
         //Never delete this line!
         $this->RegisterProfileInteger(\TpLink\VariableProfile::Runtime, '', '', ' minutes', 0, 0, 0);
-        $this->RegisterVariableString(\TpLink\VariableIdent::today_runtime, $this->Translate('Runtime today'));
-        $this->RegisterVariableString(\TpLink\VariableIdent::month_runtime, $this->Translate('Runtime month'));
-        $this->RegisterVariableInteger(\TpLink\VariableIdent::today_runtime_raw, $this->Translate('Runtime today (minutes)'), \TpLink\VariableProfile::Runtime);
-        $this->RegisterVariableInteger(\TpLink\VariableIdent::month_runtime_raw, $this->Translate('Runtime month (minutes)'), \TpLink\VariableProfile::Runtime);
-        $this->RegisterVariableFloat(\TpLink\VariableIdent::today_energy, $this->Translate('Energy today'), '~Electricity.Wh');
-        $this->RegisterVariableFloat(\TpLink\VariableIdent::month_energy, $this->Translate('Energy month'), '~Electricity.Wh');
-        $this->RegisterVariableFloat(\TpLink\VariableIdent::current_power, $this->Translate('Current power'), '~Watt');
+        $this->RegisterVariableString(\TpLink\VariableIdentP110::today_runtime, $this->Translate('Runtime today'));
+        $this->RegisterVariableString(\TpLink\VariableIdentP110::month_runtime, $this->Translate('Runtime month'));
+        $this->RegisterVariableInteger(\TpLink\VariableIdentP110::today_runtime_raw, $this->Translate('Runtime today (minutes)'), \TpLink\VariableProfile::Runtime);
+        $this->RegisterVariableInteger(\TpLink\VariableIdentP110::month_runtime_raw, $this->Translate('Runtime month (minutes)'), \TpLink\VariableProfile::Runtime);
+        $this->RegisterVariableFloat(\TpLink\VariableIdentP110::today_energy, $this->Translate('Energy today'), '~Electricity.Wh');
+        $this->RegisterVariableFloat(\TpLink\VariableIdentP110::month_energy, $this->Translate('Energy month'), '~Electricity.Wh');
+        $this->RegisterVariableFloat(\TpLink\VariableIdentP110::current_power, $this->Translate('Current power'), '~Watt');
         parent::ApplyChanges();
     }
 
@@ -37,13 +37,13 @@ class TapoP110 extends TapoP100
         if (parent::RequestState()) {
             $Result = $this->GetEnergyUsage();
             if (is_array($Result)) {
-                $this->SetValue(\TpLink\VariableIdent::today_runtime_raw, $Result[\TpLink\VariableIdent::today_runtime]);
-                $this->SetValue(\TpLink\VariableIdent::month_runtime_raw, $Result[\TpLink\VariableIdent::month_runtime]);
-                $this->SetValue(\TpLink\VariableIdent::today_runtime, sprintf(gmdate('H \%\s i \%\s', $Result[\TpLink\VariableIdent::today_runtime] * 60), $this->Translate('hours'), $this->Translate('minutes')));
-                $this->SetValue(\TpLink\VariableIdent::month_runtime, sprintf(gmdate('z \%\s H \%\s i \%\s', $Result[\TpLink\VariableIdent::month_runtime] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
-                $this->SetValue(\TpLink\VariableIdent::today_energy, $Result[\TpLink\VariableIdent::today_energy]);
-                $this->SetValue(\TpLink\VariableIdent::month_energy, $Result[\TpLink\VariableIdent::month_energy]);
-                $this->SetValue(\TpLink\VariableIdent::current_power, ($Result[\TpLink\VariableIdent::current_power] / 1000));
+                $this->SetValue(\TpLink\VariableIdentP110::today_runtime_raw, $Result[\TpLink\VariableIdentP110::today_runtime]);
+                $this->SetValue(\TpLink\VariableIdentP110::month_runtime_raw, $Result[\TpLink\VariableIdentP110::month_runtime]);
+                $this->SetValue(\TpLink\VariableIdentP110::today_runtime, sprintf(gmdate('H \%\s i \%\s', $Result[\TpLink\VariableIdentP110::today_runtime] * 60), $this->Translate('hours'), $this->Translate('minutes')));
+                $this->SetValue(\TpLink\VariableIdentP110::month_runtime, sprintf(gmdate('z \%\s H \%\s i \%\s', $Result[\TpLink\VariableIdentP110::month_runtime] * 60), $this->Translate('days'), $this->Translate('hours'), $this->Translate('minutes')));
+                $this->SetValue(\TpLink\VariableIdentP110::today_energy, $Result[\TpLink\VariableIdentP110::today_energy]);
+                $this->SetValue(\TpLink\VariableIdentP110::month_energy, $Result[\TpLink\VariableIdentP110::month_energy]);
+                $this->SetValue(\TpLink\VariableIdentP110::current_power, ($Result[\TpLink\VariableIdentP110::current_power] / 1000));
                 return true;
             }
         }

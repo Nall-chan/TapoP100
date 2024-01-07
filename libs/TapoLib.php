@@ -61,7 +61,6 @@ namespace TpLink\Api
 
     class Param
     {
-        public const DeviceOn = 'device_on';
         public const Username = 'username';
         public const Password = 'password';
     }
@@ -69,7 +68,6 @@ namespace TpLink\Api
     class Result
     {
         public const Result = 'result';
-        public const DeviceOn = 'device_on';
         public const Nickname = 'nickname';
         public const Response = 'response';
         public const EncryptedKey = 'key';
@@ -144,6 +142,14 @@ namespace TpLink\Api
 
 namespace TpLink
 {
+    const IPSVarName = 'IPSVarName';
+    const IPSVarType = 'IPSVarType';
+    const IPSVarProfile = 'IPSVarProfile';
+    const HasAction = 'HasAction';
+    const HasRange = 'HasRange';
+    const ReceiveFunction = 'ReceiveFunction';
+    const SendFunction = 'SendFunction';
+
     class Property
     {
         public const Open = 'Open';
@@ -161,7 +167,27 @@ namespace TpLink
 
     class VariableIdent
     {
-        public const State = 'State';
+        public const device_on = 'device_on';
+        public const rssi = 'rssi'; //todo
+
+        public static $DefaultIdents = [
+            self::device_on=> [
+                IPSVarName   => 'State',
+                IPSVarType   => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile=> '~Switch',
+                HasAction    => true
+            ],
+            self::rssi => [
+                IPSVarName              => 'Rssi',
+                IPSVarType              => VARIABLETYPE_INTEGER,
+                IPSVarProfile           => '',
+                HasAction               => false
+            ]
+        ];
+    }
+
+    class VariableIdentP110 extends VariableIdent
+    {
         public const today_runtime = 'today_runtime';
         public const month_runtime = 'month_runtime';
         public const today_runtime_raw = 'today_runtime_raw';
@@ -169,6 +195,59 @@ namespace TpLink
         public const today_energy = 'today_energy';
         public const month_energy = 'month_energy';
         public const current_power = 'current_power';
+    }
+
+    class VariableIdentBulb extends VariableIdent
+    {
+        public const overheated = 'overheated';
+        public const brightness = 'brightness';
+        public const hue = 'hue';
+        public const saturation = 'saturation';
+        public const color_temp = 'color_temp';
+        public const dynamic_light_effect_enable = 'dynamic_light_effect_enable';
+        public const color_rgb = 'color_rgb';
+
+        public static $DeviceIdents = [
+            self::overheated=> [
+                IPSVarName   => 'Overheated',
+                IPSVarType   => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile=> '~Alert',
+                HasAction    => false
+            ],
+            self::brightness=> [
+                IPSVarName   => 'Brightness',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> '~Intensity.100',
+                HasAction    => true
+            ],
+            self::hue=> [ // 0-360
+                IPSVarName   => 'Hue',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> '',
+                HasAction    => false
+            ],
+            self::saturation=> [ //0-100
+                IPSVarName   => 'Saturation',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> '',
+                HasAction    => false
+            ],
+            self::color_temp=> [
+                IPSVarName   => 'Color temp',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> '~TWColor',
+                HasAction    => true,
+                HasRange     => self::color_temp . '_range'
+            ],
+            self::color_rgb=> [
+                IPSVarName     => 'Color',
+                IPSVarType     => VARIABLETYPE_INTEGER,
+                IPSVarProfile  => '~HexColor',
+                HasAction      => true,
+                ReceiveFunction=> 'HSVtoRGB',
+                SendFunction   => 'RGBtoHSV'
+            ],
+        ];
     }
 
     class VariableProfile
@@ -338,6 +417,7 @@ namespace TpLink
             }
             return $Result;
         }
+
         protected function SetStatus($Status)
         {
             if ($Status != IS_ACTIVE) {
@@ -349,8 +429,24 @@ namespace TpLink
             return true;
         }
 
+        protected function SetDeviceInfo(array $Values)
+        {
+            $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::SetDeviceInfo, $this->terminalUUID, $Values);
+            $Response = $this->SendRequest($Request);
+            if ($Response === '') {
+                return false;
+            }
+            $json = json_decode($Response, true);
+            if ($json[\TpLink\Api\ErrorCode] != 0) {
+                trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
+                return false;
+            }
+            return true;
+        }
+
         protected function SendRequest(string $Request): string
         {
+            $this->SendDebug(__FUNCTION__, $Request, 0);
             if ($this->GetStatus() != IS_ACTIVE) {
                 if ($this->ReadPropertyBoolean(\TpLink\Property::Open)) {
                     if (!$this->Init()) {
@@ -377,7 +473,7 @@ namespace TpLink
                 case 0:
                     $this->SendDebug('Not connected', '', 0);
                     break;
-                case  400:
+                case 400:
                     $this->SendDebug('Bad Request', $HttpCode, 0);
                     break;
                 case 401:
@@ -533,7 +629,7 @@ namespace TpLink
             $Payload = hash('sha256', $this->KlapRemoteSeed . $this->KlapLocalSeed . $this->KlapUserHash, true);
             $Result = $this->CurlRequest($Url, $Payload, true);
             $this->SendDebug('Klap Handshake Result', $Result, 0);
-            return  $Result !== false;
+            return $Result !== false;
         }
 
         private function KlapEncryptedRequest(string $Payload): string
