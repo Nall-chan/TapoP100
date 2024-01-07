@@ -21,6 +21,7 @@ class TapoBulb extends \TpLink\Device
 {
     public function ApplyChanges()
     {
+        $this->RegisterProfileInteger(\TpLink\VariableProfile::ColorTemp, '', '', '', 2500, 6500, 1);
         //Never delete this line!
         parent::ApplyChanges();
     }
@@ -58,7 +59,7 @@ class TapoBulb extends \TpLink\Device
                 if (!array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
                     continue;
                 }
-                $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]};
+                $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}();
             }
 
             $this->MaintainVariable(
@@ -86,7 +87,7 @@ class TapoBulb extends \TpLink\Device
             }
 
             if (array_key_exists(\TpLink\SendFunction, $AllIdents[$Ident])) {
-                $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\ReceiveFunction]});
+                $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\ReceiveFunction]}());
                 continue;
             }
             $SendValues[$Ident] = $Value;

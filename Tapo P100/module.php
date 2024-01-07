@@ -21,14 +21,14 @@ class TapoP100 extends \TpLink\Device
 {
     public function ApplyChanges()
     {
-        //Never delete this line!
-        parent::ApplyChanges();
-
         // Migrate Old 'State' Var to 'device_on' Var
         $oldVar = @$this->GetIDForIdent('State');
         if (IPS_VariableExists($oldVar)) {
             IPS_SetIdent($oldVar, \TpLink\VariableIdent::device_on);
         }
+
+        //Never delete this line!
+        parent::ApplyChanges();
 
         $this->RegisterVariableBoolean(\TpLink\VariableIdent::device_on, $this->Translate(\TpLink\VariableIdent::$DefaultIdents[\TpLink\VariableIdent::device_on][\TpLink\IPSVarName]), '~Switch');
         $this->EnableAction(\TpLink\VariableIdent::device_on);

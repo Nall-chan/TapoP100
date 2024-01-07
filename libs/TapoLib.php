@@ -87,6 +87,7 @@ namespace TpLink\Api
             1002 => 'Incorrect Request',
             1003 => 'Invalid Protocol',
             -1003=> 'JSON formatting error ',
+            -1008=> 'Value out of range',
             9999 => 'Session Timeout'
         ];
 
@@ -146,7 +147,6 @@ namespace TpLink
     const IPSVarType = 'IPSVarType';
     const IPSVarProfile = 'IPSVarProfile';
     const HasAction = 'HasAction';
-    const HasRange = 'HasRange';
     const ReceiveFunction = 'ReceiveFunction';
     const SendFunction = 'SendFunction';
 
@@ -235,9 +235,8 @@ namespace TpLink
             self::color_temp=> [
                 IPSVarName   => 'Color temp',
                 IPSVarType   => VARIABLETYPE_INTEGER,
-                IPSVarProfile=> '~TWColor',
-                HasAction    => true,
-                HasRange     => self::color_temp . '_range'
+                IPSVarProfile=> VariableProfile::ColorTemp,
+                HasAction    => true
             ],
             self::color_rgb=> [
                 IPSVarName     => 'Color',
@@ -253,6 +252,7 @@ namespace TpLink
     class VariableProfile
     {
         public const Runtime = 'Tapo.Runtime';
+        public const ColorTemp = 'Tapo.ColorTemp';
     }
 
     class TpLinkCipher
