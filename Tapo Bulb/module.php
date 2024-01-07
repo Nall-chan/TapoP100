@@ -44,7 +44,6 @@ class TapoBulb extends \TpLink\Device
     {
         $Result = $this->GetDeviceInfo();
         if (is_array($Result)) {
-            $this->SetValue(\TpLink\VariableIdent::device_on, $Result[\TpLink\VariableIdent::device_on]);
             $this->SetVariables($Result);
             return true;
         }
@@ -59,7 +58,7 @@ class TapoBulb extends \TpLink\Device
                 if (!array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
                     continue;
                 }
-                $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}();
+                $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}($Values);
             }
 
             $this->MaintainVariable(
@@ -87,7 +86,7 @@ class TapoBulb extends \TpLink\Device
             }
 
             if (array_key_exists(\TpLink\SendFunction, $AllIdents[$Ident])) {
-                $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\ReceiveFunction]}());
+                $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\SendFunction]}($Value));
                 continue;
             }
             $SendValues[$Ident] = $Value;
