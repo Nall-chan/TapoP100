@@ -217,20 +217,8 @@ namespace TpLink
             self::brightness=> [
                 IPSVarName   => 'Brightness',
                 IPSVarType   => VARIABLETYPE_INTEGER,
-                IPSVarProfile=> '~Intensity.100',
+                IPSVarProfile=> VariableProfile::Brightness,
                 HasAction    => true
-            ],
-            self::hue=> [ // 0-360
-                IPSVarName   => 'Hue',
-                IPSVarType   => VARIABLETYPE_INTEGER,
-                IPSVarProfile=> '',
-                HasAction    => false
-            ],
-            self::saturation=> [ //0-100
-                IPSVarName   => 'Saturation',
-                IPSVarType   => VARIABLETYPE_INTEGER,
-                IPSVarProfile=> '',
-                HasAction    => false
             ],
             self::color_temp=> [
                 IPSVarName   => 'Color temp',
@@ -241,7 +229,7 @@ namespace TpLink
             self::color_rgb=> [
                 IPSVarName     => 'Color',
                 IPSVarType     => VARIABLETYPE_INTEGER,
-                IPSVarProfile  => '~HexColor',
+                IPSVarProfile  => VariableProfile::HexColor,
                 HasAction      => true,
                 ReceiveFunction=> 'HSVtoRGB',
                 SendFunction   => 'RGBtoHSV'
@@ -253,6 +241,8 @@ namespace TpLink
     {
         public const Runtime = 'Tapo.Runtime';
         public const ColorTemp = 'Tapo.ColorTemp';
+        public const Brightness = 'Tapo.Brightness';
+        public const HexColor = '~HexColor';
     }
     class KelvinTable
     {

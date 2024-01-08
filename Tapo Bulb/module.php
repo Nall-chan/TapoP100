@@ -21,6 +21,7 @@ class TapoBulb extends \TpLink\Device
 {
     public function ApplyChanges()
     {
+        $this->RegisterProfileInteger(\TpLink\VariableProfile::Brightness, 'Intensity', '', '%', 1, 100, 1);
         $this->RegisterProfileInteger(\TpLink\VariableProfile::ColorTemp, '', '', '', 2500, 6500, 1);
         //Never delete this line!
         parent::ApplyChanges();
