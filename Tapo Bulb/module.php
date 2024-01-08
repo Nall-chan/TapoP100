@@ -107,6 +107,11 @@ class TapoBulb extends \TpLink\Device
 
     private function HSVtoRGB(array $Values)
     {
+        $color_temp = $Values[\TpLink\VariableIdentBulb::color_temp];
+        if ($color_temp > 0) {
+            list($red, $green, $blue) = \TpLink\KelvinTable::ToRGB($color_temp);
+            return ($red << 16) ^ ($green << 8) ^ $blue;
+        }
         $hue = $Values[\TpLink\VariableIdentBulb::hue] / 360;
         $saturation = $Values[\TpLink\VariableIdentBulb::saturation] / 100;
         $value = $Values[\TpLink\VariableIdentBulb::brightness] / 100;
@@ -164,6 +169,8 @@ class TapoBulb extends \TpLink\Device
 
     private function RGBtoHSV(int $RGB)
     {
+
+        $Values[\TpLink\VariableIdentBulb::color_temp] = 0;
         $Values[\TpLink\VariableIdentBulb::hue] = 0;
         $Values[\TpLink\VariableIdentBulb::saturation] = 0;
 
