@@ -8,10 +8,10 @@ namespace {
     eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/helper/SemaphoreHelper.php') . '}');
     eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/helper/VariableProfileHelper.php') . '}');
 
-    $AutoLoader = new AutoLoaderTapoP100PHPSecLib('Crypt/Random');
+    $AutoLoader = new AutoLoaderTapoPHPSecLib('Crypt/Random');
     $AutoLoader->register();
 
-    class AutoLoaderTapoP100PHPSecLib
+    class AutoLoaderTapoPHPSecLib
     {
         private $namespace;
 
@@ -40,6 +40,7 @@ namespace TpLink\Api
 {
     const Protocol = 'http://';
     const ErrorCode = 'error_code';
+    const Result = 'result';
 
     class Url
     {
@@ -67,10 +68,15 @@ namespace TpLink\Api
 
     class Result
     {
-        public const Result = 'result';
         public const Nickname = 'nickname';
         public const Response = 'response';
         public const EncryptedKey = 'key';
+        public const Ip = 'ip';
+        public const Mac = 'mac';
+        public const DeviceType = 'device_type';
+        public const DeviceModel = 'device_model';
+        public const MGT = 'mgt_encrypt_schm';
+        public const Protocol = 'encrypt_type';
     }
 
     class Protocol
@@ -78,6 +84,7 @@ namespace TpLink\Api
         public const Method = 'method';
         public const Params = 'params';
         private const ParamHandshakeKey = 'key';
+        private const DiscoveryKey = 'rsa_key';
         private const requestTimeMils = 'requestTimeMils';
         private const TerminalUUID = 'terminalUUID';
         public static $ErrorCodes = [
@@ -86,7 +93,7 @@ namespace TpLink\Api
             -1501=> 'Invalid Request or Credentials',
             1002 => 'Incorrect Request',
             1003 => 'Invalid Protocol',
-            -1003=> 'JSON formatting error ',
+            -1003=> 'JSON formatting error',
             -1008=> 'Value out of range',
             9999 => 'Session Timeout'
         ];
@@ -117,6 +124,15 @@ namespace TpLink\Api
             }
 
             return json_encode($Request);
+        }
+
+        public static function BuildDiscoveryRequest(string $publicKey): string
+        {
+            return json_encode([
+                self::Params=> [
+                    self::DiscoveryKey=> mb_convert_encoding($publicKey, 'ISO-8859-1', 'UTF-8')
+                ]
+            ]);
         }
     }
 
@@ -150,14 +166,52 @@ namespace TpLink
     const ReceiveFunction = 'ReceiveFunction';
     const SendFunction = 'SendFunction';
 
+    class DeviceModel
+    {
+        public const PlugP100 = 'P100';
+        public const PlugP110 = 'P110';
+        public const BulbL530 = 'L530';
+        public const KH100 = 'KH100';
+    }
+
+    class GUID
+    {
+        public const PlugP100 = '{AAD6F48D-C23F-4C59-8049-A9746DEB699B}';
+        public const PlugP110 = '{B18B6CAA-AB46-495D-9A7A-85FA3A83113A}';
+        public const BulbL530 = '{3C59DCC3-4441-4E1C-A59C-9F8D26CE2E82}';
+        public const KH100 = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
+
+        public static $TapoDevices = [
+            DeviceModel::PlugP100 => self::PlugP100,
+            DeviceModel::PlugP110 => self::PlugP110,
+            DeviceModel::BulbL530 => self::BulbL530,
+            DeviceModel::KH100    => self::KH100,
+        ];
+        public static function GetByModel(string $Model)
+        {
+            if (!array_key_exists($Model, self::$TapoDevices)) {
+                return false;
+            }
+            return self::$TapoDevices[$Model];
+        }
+    }
+
     class Property
     {
         public const Open = 'Open';
         public const Host = 'Host';
+        public const Mac = 'Mac';
         public const Username = 'Username';
         public const Password = 'Password';
         public const Interval = 'Interval';
         public const AutoRename = 'AutoRename';
+        public const Protocol = 'Protocol';
+    }
+
+    class Attribute
+    {
+        public const Username = 'Username';
+        public const Password = 'Password';
     }
 
     class Timer
@@ -174,7 +228,7 @@ namespace TpLink
             self::device_on=> [
                 IPSVarName   => 'State',
                 IPSVarType   => VARIABLETYPE_BOOLEAN,
-                IPSVarProfile=> '~Switch',
+                IPSVarProfile=> VariableProfile::Switch,
                 HasAction    => true
             ],
             self::rssi => [
@@ -197,7 +251,7 @@ namespace TpLink
         public const current_power = 'current_power';
     }
 
-    class VariableIdentBulb extends VariableIdent
+    class VariableIdentLight extends VariableIdent
     {
         public const overheated = 'overheated';
         public const brightness = 'brightness';
@@ -237,13 +291,45 @@ namespace TpLink
         ];
     }
 
+    class VariableIdentTrv extends VariableIdent
+    {
+        public const target_temp = 'target_temp';
+        public const temp_offset = 'temp_offset';
+        public const frost_protection_on = 'frost_protection_on';
+        public const child_protection = 'child_protection';
+
+        public static $DeviceIdents = [
+            self::target_temp=> [
+                IPSVarName   => 'Setpoint temperature',
+                IPSVarType   => VARIABLETYPE_FLOAT,
+                IPSVarProfile=> VariableProfile::TargetTemperature,
+                HasAction    => true
+            ],
+            self::frost_protection_on=> [
+                IPSVarName     => 'Frost protection',
+                IPSVarType     => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile  => VariableProfile::Switch,
+                HasAction      => true
+            ],
+            self::child_protection=> [
+                IPSVarName     => 'Child Protection',
+                IPSVarType     => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile  => VariableProfile::Switch,
+                HasAction      => true
+            ],
+        ];
+    }
+
     class VariableProfile
     {
         public const Runtime = 'Tapo.Runtime';
         public const ColorTemp = 'Tapo.ColorTemp';
         public const Brightness = 'Tapo.Brightness';
+        public const Switch = '~Switch';
         public const HexColor = '~HexColor';
+        public const TargetTemperature = '~Temperature.Room';
     }
+
     class KelvinTable
     {
         private static $Table = [
@@ -300,8 +386,8 @@ namespace TpLink
             }
             return $RGB;
         }
-
     }
+
     class TpLinkCipher
     {
         private $key;
@@ -411,6 +497,8 @@ namespace TpLink
             parent::Create();
             $this->RegisterPropertyBoolean(\TpLink\Property::Open, false);
             $this->RegisterPropertyString(\TpLink\Property::Host, '');
+            $this->RegisterPropertyString(\TpLink\Property::Mac, '');
+            $this->RegisterPropertyString(\TpLink\Property::Protocol, 'KLAP');
             $this->RegisterPropertyString(\TpLink\Property::Username, '');
             $this->RegisterPropertyString(\TpLink\Property::Password, '');
             $this->RegisterPropertyInteger(\TpLink\Property::Interval, 5);
@@ -444,6 +532,30 @@ namespace TpLink
             }
         }
 
+        public function GetConfigurationForm()
+        {
+            return file_get_contents(__DIR__ . '/form.json');
+        }
+
+        public function Translate($Text)
+        {
+            $translation = json_decode(file_get_contents(__DIR__ . '/locale.json'), true);
+            $language = IPS_GetSystemLanguage();
+            $code = explode('_', $language)[0];
+            if (isset($translation['translations'])) {
+                if (isset($translation['translations'][$language])) {
+                    if (isset($translation['translations'][$language][$Text])) {
+                        return $translation['translations'][$language][$Text];
+                    }
+                } elseif (isset($translation['translations'][$code])) {
+                    if (isset($translation['translations'][$code][$Text])) {
+                        return $translation['translations'][$code][$Text];
+                    }
+                }
+            }
+            return $Text;
+        }
+
         public function GetDeviceInfo()
         {
             $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::GetDeviceInfo);
@@ -454,10 +566,12 @@ namespace TpLink
             }
             $json = json_decode($Response, true);
             if ($json[\TpLink\Api\ErrorCode] != 0) {
-                trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]]), E_USER_NOTICE);
+                restore_error_handler();
                 return false;
             }
-            $Result = $json[\TpLink\Api\Result::Result];
+            $Result = $json[\TpLink\Api\Result];
             $Name = base64_decode($Result[\TpLink\Api\Result::Nickname]);
             if ($this->ReadPropertyBoolean(\TpLink\Property::AutoRename) && (IPS_GetName($this->InstanceID) != $Name) && ($Name != '')) {
                 IPS_SetName($this->InstanceID, $Name);
@@ -485,7 +599,9 @@ namespace TpLink
             }
             $json = json_decode($Response, true);
             if ($json[\TpLink\Api\ErrorCode] != 0) {
-                trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]]), E_USER_NOTICE);
+                restore_error_handler();
                 return false;
             }
             return true;
@@ -497,12 +613,16 @@ namespace TpLink
             if ($this->GetStatus() != IS_ACTIVE) {
                 if ($this->ReadPropertyBoolean(\TpLink\Property::Open)) {
                     if (!$this->Init()) {
+                        set_error_handler([$this, 'ModulErrorHandler']);
                         trigger_error($this->Translate('Error on reconnect'), E_USER_NOTICE);
+                        restore_error_handler();
                         $this->SetStatus(IS_EBASE + 1);
                         return '';
                     }
                 } else {
+                    set_error_handler([$this, 'ModulErrorHandler']);
                     trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
+                    restore_error_handler();
                     return '';
                 }
             }
@@ -532,6 +652,12 @@ namespace TpLink
             }
         }
 
+        protected function ModulErrorHandler(int $errno, string $errstr): bool
+        {
+            echo $errstr . PHP_EOL;
+            return true;
+        }
+
         private function InitBuffers()
         {
             $this->token = '';
@@ -546,27 +672,36 @@ namespace TpLink
 
         private function Init(): bool
         {
-            $Result = $this->Handshake();
-            if ($Result === true) {
-                if ($this->Login()) {
-                    $this->SetStatus(IS_ACTIVE);
-                    return true;
-                }
-                return false;
-            }
-            if ($Result === false) {
-                return false;
-            }
-            if ($Result === 1003) {
-                if ($this->InitKlap()) {
-                    if ($this->HandshakeKlap()) {
-                        $this->SetStatus(IS_ACTIVE);
-                        return true;
+            switch ($this->ReadPropertyString(\TpLink\Property::Protocol)) {
+                case 'AES':
+                    $Result = $this->Handshake();
+                    if ($Result === true) {
+                        if ($this->Login()) {
+                            $this->SetStatus(IS_ACTIVE);
+                            return true;
+                        }
+                        return false;
                     }
-                }
-                return false;
+                    if ($Result === 1003) {
+                        set_error_handler([$this, 'ModulErrorHandler']);
+                        trigger_error($this->Translate(\TpLink\Api\Protocol::$ErrorCodes[$Result]), E_USER_NOTICE);
+                        restore_error_handler();
+                    }
+                    return false;
+                    break;
+                case 'KLAP':
+                    if ($this->InitKlap()) {
+                        if ($this->HandshakeKlap()) {
+                            $this->SetStatus(IS_ACTIVE);
+                            return true;
+                        }
+                    }
+                    return false;
+                    break;
             }
-            trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$Result], E_USER_NOTICE);
+            set_error_handler([$this, 'ModulErrorHandler']);
+            trigger_error($this->Translate(\TpLink\Api\Protocol::$ErrorCodes[1003]), E_USER_NOTICE);
+            restore_error_handler();
             return false;
         }
 
@@ -683,7 +818,9 @@ namespace TpLink
         {
             if ($this->KlapLocalSeed === '') {
                 if (!$this->Init()) {
+                    set_error_handler([$this, 'ModulErrorHandler']);
                     trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
+                    restore_error_handler();
                     $this->SetStatus(IS_EBASE + 1);
                     return '';
                 }
@@ -695,7 +832,9 @@ namespace TpLink
             $Result = $this->CurlRequest($Url, $EncryptedPayload);
             if ($Result === false) {
                 if (!$this->Init()) {
+                    set_error_handler([$this, 'ModulErrorHandler']);
                     trigger_error($this->Translate('Not connected'), E_USER_NOTICE);
+                    restore_error_handler();
                     $this->SetStatus(IS_EBASE + 1);
                     return '';
                 } else {
@@ -719,7 +858,9 @@ namespace TpLink
                 } else {
                     $msg = $decryptedResponse;
                 }
-                trigger_error($msg, E_USER_NOTICE);
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate($msg), E_USER_NOTICE);
+                restore_error_handler();
                 return '';
             }
             return $decryptedResponse;
@@ -746,7 +887,7 @@ namespace TpLink
             if ($json[\TpLink\Api\ErrorCode] != 0) {
                 return $json[\TpLink\Api\ErrorCode];
             }
-            $encryptedKey = $json[\TpLink\Api\Result::Result][\TpLink\Api\Result::EncryptedKey];
+            $encryptedKey = $json[\TpLink\Api\Result][\TpLink\Api\Result::EncryptedKey];
             $ciphertext = base64_decode($encryptedKey);
             $rsa = new \phpseclib\Crypt\RSA();
             $rsa->loadKey($privateKey);
@@ -776,13 +917,15 @@ namespace TpLink
             if ($Result === false) {
                 return false;
             }
-            $json = json_decode($tp_link_cipher->decrypt(json_decode($Result, true)[\TpLink\Api\Result::Result][\TpLink\Api\Result::Response]), true);
+            $json = json_decode($tp_link_cipher->decrypt(json_decode($Result, true)[\TpLink\Api\Result][\TpLink\Api\Result::Response]), true);
             $this->SendDebug(__FUNCTION__ . ' Result', $json, 0);
             if ($json[\TpLink\Api\ErrorCode] == 0) {
-                $this->token = $json[\TpLink\Api\Result::Result]['token'];
+                $this->token = $json[\TpLink\Api\Result]['token'];
                 return true;
             }
-            trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
+            set_error_handler([$this, 'ModulErrorHandler']);
+            trigger_error($this->Translate(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]]), E_USER_NOTICE);
+            restore_error_handler();
             return false;
         }
 
@@ -815,10 +958,12 @@ namespace TpLink
                 } else {
                     $msg = $Result;
                 }
-                trigger_error($msg, E_USER_NOTICE);
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate($msg), E_USER_NOTICE);
+                restore_error_handler();
                 return '';
             }
-            return $tp_link_cipher->decrypt($json[\TpLink\Api\Result::Result][\TpLink\Api\Result::Response]);
+            return $tp_link_cipher->decrypt($json[\TpLink\Api\Result][\TpLink\Api\Result::Response]);
         }
     }
 }

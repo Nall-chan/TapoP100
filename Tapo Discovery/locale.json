@@ -1,0 +1,12 @@
+{
+    "translations": {
+        "de": {
+            "Credentials": "Anmeldedaten",
+            "Username": "Benutzername",
+            "Password": "Passwort",
+            "Save & Reload": "Speichern & Neuladen",
+            "Type": "Typ",
+            "This module is free for non-commercial use,\r\nDonations in support of the author are accepted here:": "Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos,\r\nSchenkungen als Unterstützung für den Autor werden hier akzeptiert:"
+        }
+    }
+}

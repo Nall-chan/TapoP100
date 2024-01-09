@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
- * TapoBulb Klasse für die Anbindung von TP-Link tapo WiFi Bulbs.
+ * TapoLightlb Klasse für die Anbindung von TP-Link tapo WiFi Bulbs & Strips.
  * Erweitert IPSModule.
  *
  * @author        Michael Tröger <micha@nall-chan.net>
@@ -17,7 +17,7 @@ require_once dirname(__DIR__) . '/libs/TapoLib.php';
  * @example <b>Ohne</b>
  *
  */
-class TapoBulb extends \TpLink\Device
+class TapoLight extends \TpLink\Device
 {
     public function ApplyChanges()
     {
@@ -29,7 +29,7 @@ class TapoBulb extends \TpLink\Device
 
     public function RequestAction($Ident, $Value)
     {
-        $AllIdents = array_merge(\TpLink\VariableIdentBulb::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
+        $AllIdents = array_merge(\TpLink\VariableIdentLight::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
         if (array_key_exists($Ident, $AllIdents)) {
             if ($AllIdents[$Ident][\TpLink\HasAction]) {
                 if ($this->SetDeviceInfo([$Ident => $Value])) {
@@ -53,7 +53,7 @@ class TapoBulb extends \TpLink\Device
 
     protected function SetVariables(array $Values)
     {
-        $AllIdents = array_merge(\TpLink\VariableIdentBulb::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
+        $AllIdents = array_merge(\TpLink\VariableIdentLight::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
         foreach ($AllIdents as $Ident => $VarParams) {
             if (!array_key_exists($Ident, $Values)) {
                 if (!array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
@@ -80,7 +80,7 @@ class TapoBulb extends \TpLink\Device
     protected function SetDeviceInfo(array $Values)
     {
         $SendValues = [];
-        $AllIdents = array_merge(\TpLink\VariableIdentBulb::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
+        $AllIdents = array_merge(\TpLink\VariableIdentLight::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
         foreach ($Values as $Ident => $Value) {
             if (!array_key_exists($Ident, $AllIdents)) {
                 continue;
@@ -108,14 +108,14 @@ class TapoBulb extends \TpLink\Device
 
     private function HSVtoRGB(array $Values)
     {
-        $color_temp = $Values[\TpLink\VariableIdentBulb::color_temp];
+        $color_temp = $Values[\TpLink\VariableIdentLight::color_temp];
         if ($color_temp > 0) {
             list($red, $green, $blue) = \TpLink\KelvinTable::ToRGB($color_temp);
             return ($red << 16) ^ ($green << 8) ^ $blue;
         }
-        $hue = $Values[\TpLink\VariableIdentBulb::hue] / 360;
-        $saturation = $Values[\TpLink\VariableIdentBulb::saturation] / 100;
-        $value = $Values[\TpLink\VariableIdentBulb::brightness] / 100;
+        $hue = $Values[\TpLink\VariableIdentLight::hue] / 360;
+        $saturation = $Values[\TpLink\VariableIdentLight::saturation] / 100;
+        $value = $Values[\TpLink\VariableIdentLight::brightness] / 100;
         if ($saturation == 0) {
             $red = $value * 255;
             $green = $value * 255;
@@ -170,10 +170,9 @@ class TapoBulb extends \TpLink\Device
 
     private function RGBtoHSV(int $RGB)
     {
-
-        $Values[\TpLink\VariableIdentBulb::color_temp] = 0;
-        $Values[\TpLink\VariableIdentBulb::hue] = 0;
-        $Values[\TpLink\VariableIdentBulb::saturation] = 0;
+        $Values[\TpLink\VariableIdentLight::color_temp] = 0;
+        $Values[\TpLink\VariableIdentLight::hue] = 0;
+        $Values[\TpLink\VariableIdentLight::saturation] = 0;
 
         $red = ($RGB >> 16) / 255;
         $green = (($RGB & 0x00FF00) >> 8) / 255;
@@ -186,7 +185,7 @@ class TapoBulb extends \TpLink\Device
         $delta = $max - $min;
 
         if ($delta == 0) {
-            $Values[\TpLink\VariableIdentBulb::brightness] = (int) ($value * 100);
+            $Values[\TpLink\VariableIdentLight::brightness] = (int) ($value * 100);
             return $Values;
         }
 
@@ -195,7 +194,7 @@ class TapoBulb extends \TpLink\Device
         if ($max != 0) {
             $saturation = ($delta / $max);
         } else {
-            $Values[\TpLink\VariableIdentBulb::brightness] = (int) ($value);
+            $Values[\TpLink\VariableIdentLight::brightness] = (int) ($value);
             return $Values;
         }
         if ($red == $max) {
@@ -211,9 +210,9 @@ class TapoBulb extends \TpLink\Device
         if ($hue < 0) {
             $hue += 360;
         }
-        $Values[\TpLink\VariableIdentBulb::hue] = (int) $hue;
-        $Values[\TpLink\VariableIdentBulb::saturation] = (int) ($saturation * 100);
-        $Values[\TpLink\VariableIdentBulb::brightness] = (int) ($value * 100);
+        $Values[\TpLink\VariableIdentLight::hue] = (int) $hue;
+        $Values[\TpLink\VariableIdentLight::saturation] = (int) ($saturation * 100);
+        $Values[\TpLink\VariableIdentLight::brightness] = (int) ($value * 100);
         return $Values;
     }
 }

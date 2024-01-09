@@ -1,0 +1,12 @@
+{
+    "id": "{DCD52B0C-3E06-4EFE-AA95-C54709AC87D3}",
+    "name": "tapo Discovery",
+    "type": 5,
+    "vendor": "TP-Link",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "TAPOSH",
+    "url": "https://github.com/Nall-chan/tapoSmartHome"
+}

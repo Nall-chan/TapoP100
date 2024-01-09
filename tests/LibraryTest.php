@@ -11,6 +11,11 @@ class LibraryTest extends TestCaseSymconValidation
         $this->validateLibrary(__DIR__ . '/..');
     }
 
+    public function testValidateDiscovery(): void
+    {
+        $this->validateModule(__DIR__ . '/../Tapo Discovery');
+    }
+
     public function testValidateP100(): void
     {
         $this->validateModule(__DIR__ . '/../Tapo P100');
@@ -21,8 +26,8 @@ class LibraryTest extends TestCaseSymconValidation
         $this->validateModule(__DIR__ . '/../Tapo P110');
     }
 
-    public function testValidateBulb(): void
+    public function testValidateLight(): void
     {
-        $this->validateModule(__DIR__ . '/../Tapo Bulb');
+        $this->validateModule(__DIR__ . '/../Tapo Light');
     }
 }
