@@ -1,0 +1,35 @@
+{
+    "translations": {
+        "de": {
+            "tapo Light": "tapo Licht",
+            "Error on reconnect": "Fehler beim neuverbinden",
+            "Not connected": "Nicht verbunden",
+            "Invalid Public Key Length": "Ungültige Länge des öffentlichen Schlüssels",
+            "Invalid Request or Credentials": "Ungültige Anfrage oder Zugangsdaten",
+            "Incorrect Request": "Falsche Anfrage",
+            "Invalid Protocol": "Ungültiges Protokoll",
+            "JSON formatting error": "JSON Fehler",
+            "Value out of range": "Wert außerhalb des gültigen Bereiches",
+            "Session Timeout": "Sitzung abgelaufen",
+            "State": "Status",
+            "Runtime today": "Laufzeit Heute",
+            "Runtime month": "Laufzeit Monat",
+            "Runtime today (minutes)": "Laufzeit Heute (Minuten)",
+            "Runtime month (minutes)": "Laufzeit Monat (Minuten)",
+            "Energy today": "Energie Heute",
+            "Energy month": "Energie Monat",
+            "Current power": "Aktuelle Leistung",
+            "days": "Tage",
+            "hours": "Stunden",
+            "minutes": "Minuten",
+            " minutes": " Minuten",
+            "Overheated": "Überhitzt",
+            "Brightness": "Helligkeit",
+            "Color temp": "Farbtemperatur",
+            "Color": "Farbe",
+            "Setpoint temperature": "Solltemperatur",
+            "Frost protection": "Frostschutz",
+            "Child Protection": "Kindersicherung"
+        }
+    }
+}
