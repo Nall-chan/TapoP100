@@ -37,7 +37,7 @@ class TapoLight extends \TpLink\Device
      * @param  array $Values
      * @return int
      */
-    private function HSVtoRGB(array $Values)
+    protected function HSVtoRGB(array $Values)
     {
         $color_temp = $Values[\TpLink\VariableIdentLight::color_temp];
         if ($color_temp > 0) {
@@ -107,7 +107,7 @@ class TapoLight extends \TpLink\Device
      * @param  int $RGB
      * @return array
      */
-    private function RGBtoHSV(int $RGB)
+    protected function RGBtoHSV(int $RGB)
     {
         $Values[\TpLink\VariableIdentLight::color_temp] = 0;
         $Values[\TpLink\VariableIdentLight::hue] = 0;
