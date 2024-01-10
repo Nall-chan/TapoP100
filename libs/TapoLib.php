@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 namespace {
-    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/helper/BufferHelper.php') . '}');
-    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/helper/DebugHelper.php') . '}');
-    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/helper/SemaphoreHelper.php') . '}');
-    eval('declare(strict_types=1);namespace TapoP100 {?>' . file_get_contents(__DIR__ . '/helper/VariableProfileHelper.php') . '}');
+    eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/BufferHelper.php') . '}');
+    eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/DebugHelper.php') . '}');
+    eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/SemaphoreHelper.php') . '}');
+    eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/VariableProfileHelper.php') . '}');
 
     $AutoLoader = new AutoLoaderTapoPHPSecLib('Crypt/Random');
     $AutoLoader->register();
@@ -176,14 +176,14 @@ namespace TpLink
 
     class GUID
     {
-        public const PlugP100 = '{AAD6F48D-C23F-4C59-8049-A9746DEB699B}';
-        public const PlugP110 = '{B18B6CAA-AB46-495D-9A7A-85FA3A83113A}';
+        public const Plug = '{AAD6F48D-C23F-4C59-8049-A9746DEB699B}';
+        public const PlugEnergy = '{B18B6CAA-AB46-495D-9A7A-85FA3A83113A}';
         public const BulbL530 = '{3C59DCC3-4441-4E1C-A59C-9F8D26CE2E82}';
         public const KH100 = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
 
         public static $TapoDevices = [
-            DeviceModel::PlugP100 => self::PlugP100,
-            DeviceModel::PlugP110 => self::PlugP110,
+            DeviceModel::PlugP100 => self::Plug,
+            DeviceModel::PlugP110 => self::PlugEnergy,
             DeviceModel::BulbL530 => self::BulbL530,
             DeviceModel::KH100    => self::KH100,
         ];
@@ -224,7 +224,7 @@ namespace TpLink
         public const device_on = 'device_on';
         public const rssi = 'rssi'; //todo
 
-        public static $DefaultIdents = [
+        public static $Variables = [
             self::device_on=> [
                 IPSVarName   => 'State',
                 IPSVarType   => VARIABLETYPE_BOOLEAN,
@@ -240,7 +240,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentP110 extends VariableIdent
+    class VariableIdentEnergySocket
     {
         public const today_runtime = 'today_runtime';
         public const month_runtime = 'month_runtime';
@@ -251,7 +251,7 @@ namespace TpLink
         public const current_power = 'current_power';
     }
 
-    class VariableIdentLight extends VariableIdent
+    class VariableIdentLight
     {
         public const overheated = 'overheated';
         public const brightness = 'brightness';
@@ -261,7 +261,7 @@ namespace TpLink
         public const dynamic_light_effect_enable = 'dynamic_light_effect_enable';
         public const color_rgb = 'color_rgb';
 
-        public static $DeviceIdents = [
+        public static $Variables = [
             self::overheated=> [
                 IPSVarName   => 'Overheated',
                 IPSVarType   => VARIABLETYPE_BOOLEAN,
@@ -291,14 +291,14 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentTrv extends VariableIdent
+    class VariableIdentTrv
     {
         public const target_temp = 'target_temp';
         public const temp_offset = 'temp_offset';
         public const frost_protection_on = 'frost_protection_on';
         public const child_protection = 'child_protection';
 
-        public static $DeviceIdents = [
+        public static $Variables = [
             self::target_temp=> [
                 IPSVarName   => 'Setpoint temperature',
                 IPSVarType   => VARIABLETYPE_FLOAT,
@@ -484,12 +484,14 @@ namespace TpLink
      */
     class Device extends \IPSModule
     {
-        use \TapoP100\BufferHelper;
-        use \TapoP100\DebugHelper;
-        use \TapoP100\Semaphore;
-        use \TapoP100\VariableProfileHelper;
+        use \Tapo\BufferHelper;
+        use \Tapo\DebugHelper;
+        use \Tapo\Semaphore;
+        use \Tapo\VariableProfileHelper;
         use TpLinkKlap;
         use TpLinkSecurePassthroug;
+
+        protected static $ModuleIdents = [];
 
         public function Create()
         {
@@ -531,6 +533,21 @@ namespace TpLink
                 $this->SetStatus(IS_INACTIVE);
             }
         }
+        public function RequestAction($Ident, $Value)
+        {
+            $AllIdents = $this->GetModuleIdents();
+            if (array_key_exists($Ident, $AllIdents)) {
+                if ($AllIdents[$Ident][\TpLink\HasAction]) {
+                    if ($this->SetDeviceInfoVariables([$Ident => $Value])) {
+                        $this->SetValue($Ident, $Value);
+                    }
+                }
+                return;
+            }
+            set_error_handler([$this, 'ModulErrorHandler']);
+            trigger_error($this->Translate('Invalid ident'), E_USER_NOTICE);
+            restore_error_handler();
+        }
 
         public function GetConfigurationForm()
         {
@@ -556,6 +573,16 @@ namespace TpLink
             return $Text;
         }
 
+        public function RequestState()
+        {
+            $Result = $this->GetDeviceInfo();
+            if (is_array($Result)) {
+                $this->SetVariables($Result);
+                return true;
+            }
+            return false;
+        }
+
         public function GetDeviceInfo()
         {
             $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::GetDeviceInfo);
@@ -579,6 +606,31 @@ namespace TpLink
             return $Result;
         }
 
+        protected function SetVariables(array $Values)
+        {
+            foreach ($this->GetModuleIdents() as $Ident => $VarParams) {
+                if (!array_key_exists($Ident, $Values)) {
+                    if (!array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
+                        continue;
+                    }
+                    $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}($Values);
+                }
+
+                $this->MaintainVariable(
+                    $Ident,
+                    $this->Translate($VarParams[\TpLink\IPSVarName]),
+                    $VarParams[\TpLink\IPSVarType],
+                    $VarParams[\TpLink\IPSVarProfile],
+                    0,
+                    true
+                );
+                if ($VarParams[\TpLink\HasAction]) {
+                    $this->EnableAction($Ident);
+                }
+                $this->SetValue($Ident, $Values[$Ident]);
+            }
+        }
+
         protected function SetStatus($Status)
         {
             if ($Status != IS_ACTIVE) {
@@ -586,8 +638,34 @@ namespace TpLink
             }
             if ($this->GetStatus() != $Status) {
                 parent::SetStatus($Status);
+
+                if ($Status == IS_ACTIVE) {
+                    $this->RequestState();
+                }
             }
             return true;
+        }
+        protected function SetDeviceInfoVariables(array $Values)
+        {
+            $SendValues = [];
+            $AllIdents = $this->GetModuleIdents();
+            foreach ($Values as $Ident => $Value) {
+                if (!array_key_exists($Ident, $AllIdents)) {
+                    continue;
+                }
+                if (array_key_exists(\TpLink\SendFunction, $AllIdents[$Ident])) {
+                    $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\SendFunction]}($Value));
+                    continue;
+                }
+                $SendValues[$Ident] = $Value;
+            }
+            if (!count($SendValues)) {
+                set_error_handler([$this, 'ModulErrorHandler']);
+                trigger_error($this->Translate('Invalid ident'), E_USER_NOTICE);
+                restore_error_handler();
+                return false;
+            }
+            return $this->SetDeviceInfo($SendValues);
         }
 
         protected function SetDeviceInfo(array $Values)
@@ -656,6 +734,15 @@ namespace TpLink
         {
             echo $errstr . PHP_EOL;
             return true;
+        }
+        private function GetModuleIdents()
+        {
+            $AllIdents = [];
+            foreach (static::$ModuleIdents as $VariableIdentClassName) {
+                /** @var VariableIdent $VariableIdentClassName */
+                $AllIdents = array_merge($AllIdents, $VariableIdentClassName::$Variables);
+            }
+            return $AllIdents;
         }
 
         private function InitBuffers()

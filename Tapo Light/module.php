@@ -12,100 +12,31 @@ require_once dirname(__DIR__) . '/libs/TapoLib.php';
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.50
- *
- * @example <b>Ohne</b>
- *
+ * @version       1.60
  */
 class TapoLight extends \TpLink\Device
 {
+    protected static $ModuleIdents = [
+        '\TpLink\VariableIdent',
+        '\TpLink\VariableIdentLight'
+    ];
+
     public function ApplyChanges()
     {
         $this->RegisterProfileInteger(\TpLink\VariableProfile::Brightness, 'Intensity', '', '%', 1, 100, 1);
-        $this->RegisterProfileInteger(\TpLink\VariableProfile::ColorTemp, '', '', '', 2500, 6500, 1);
+        $this->RegisterProfileInteger(\TpLink\VariableProfile::ColorTemp, '', '', ' K', 2500, 6500, 1);
         //Never delete this line!
         parent::ApplyChanges();
     }
 
-    public function RequestAction($Ident, $Value)
-    {
-        $AllIdents = array_merge(\TpLink\VariableIdentLight::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
-        if (array_key_exists($Ident, $AllIdents)) {
-            if ($AllIdents[$Ident][\TpLink\HasAction]) {
-                if ($this->SetDeviceInfo([$Ident => $Value])) {
-                    $this->SetValue($Ident, $Value);
-                }
-            }
-            return;
-        }
-        trigger_error($this->Translate('Invalid ident'), E_USER_NOTICE);
-    }
-
-    public function RequestState()
-    {
-        $Result = $this->GetDeviceInfo();
-        if (is_array($Result)) {
-            $this->SetVariables($Result);
-            return true;
-        }
-        return false;
-    }
-
-    protected function SetVariables(array $Values)
-    {
-        $AllIdents = array_merge(\TpLink\VariableIdentLight::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
-        foreach ($AllIdents as $Ident => $VarParams) {
-            if (!array_key_exists($Ident, $Values)) {
-                if (!array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
-                    continue;
-                }
-                $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}($Values);
-            }
-
-            $this->MaintainVariable(
-                $Ident,
-                $this->Translate($VarParams[\TpLink\IPSVarName]),
-                $VarParams[\TpLink\IPSVarType],
-                $VarParams[\TpLink\IPSVarProfile],
-                0,
-                true
-            );
-            if ($VarParams[\TpLink\HasAction]) {
-                $this->EnableAction($Ident);
-            }
-            $this->SetValue($Ident, $Values[$Ident]);
-        }
-    }
-
-    protected function SetDeviceInfo(array $Values)
-    {
-        $SendValues = [];
-        $AllIdents = array_merge(\TpLink\VariableIdentLight::$DeviceIdents, \TpLink\VariableIdent::$DefaultIdents);
-        foreach ($Values as $Ident => $Value) {
-            if (!array_key_exists($Ident, $AllIdents)) {
-                continue;
-            }
-
-            if (array_key_exists(\TpLink\SendFunction, $AllIdents[$Ident])) {
-                $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\SendFunction]}($Value));
-                continue;
-            }
-            $SendValues[$Ident] = $Value;
-        }
-        return parent::SetDeviceInfo($SendValues);
-    }
-
-    protected function SetStatus($Status)
-    {
-        if ($this->GetStatus() != $Status) {
-            parent::SetStatus($Status);
-            if ($Status == IS_ACTIVE) {
-                $this->RequestState();
-            }
-        }
-        return true;
-    }
-
+    /**
+     * HSVtoRGB
+     *
+     * not static, falls wir doch auf Statusvariablen zurückgreifen müssen
+     *
+     * @param  array $Values
+     * @return int
+     */
     private function HSVtoRGB(array $Values)
     {
         $color_temp = $Values[\TpLink\VariableIdentLight::color_temp];
@@ -168,6 +99,14 @@ class TapoLight extends \TpLink\Device
         return ($red << 16) ^ ($green << 8) ^ $blue;
     }
 
+    /**
+     * RGBtoHSV
+     *
+     * not static, falls wir doch auf Statusvariablen zurückgreifen müssen
+     *
+     * @param  int $RGB
+     * @return array
+     */
     private function RGBtoHSV(int $RGB)
     {
         $Values[\TpLink\VariableIdentLight::color_temp] = 0;

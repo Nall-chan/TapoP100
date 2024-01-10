@@ -16,14 +16,14 @@ class LibraryTest extends TestCaseSymconValidation
         $this->validateModule(__DIR__ . '/../Tapo Discovery');
     }
 
-    public function testValidateP100(): void
+    public function testValidateSocket(): void
     {
-        $this->validateModule(__DIR__ . '/../Tapo P100');
+        $this->validateModule(__DIR__ . '/../Tapo Socket');
     }
 
-    public function testValidateP110(): void
+    public function testValidateEnergySocket(): void
     {
-        $this->validateModule(__DIR__ . '/../Tapo P110');
+        $this->validateModule(__DIR__ . '/../Tapo Energy Socket');
     }
 
     public function testValidateLight(): void

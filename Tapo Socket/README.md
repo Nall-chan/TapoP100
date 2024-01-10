@@ -6,7 +6,7 @@
 [![Run Tests](https://github.com/Nall-chan/SSHClient/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)  
 [![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)
 [![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
-# tapo Discovery  <!-- omit in toc -->
+# tapo Smart Socket<!-- omit in toc -->
 
 ## Inhaltsverzeichnis <!-- omit in toc -->
 
@@ -15,6 +15,8 @@
 - [3. Software-Installation](#3-software-installation)
 - [4. Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
 - [5. Statusvariablen und Profile](#5-statusvariablen-und-profile)
+  - [Statusvariablen](#statusvariablen)
+  - [Profile](#profile)
 - [6. PHP-Befehlsreferenz](#6-php-befehlsreferenz)
 - [7. Aktionen](#7-aktionen)
 - [8. Anhang](#8-anhang)
@@ -25,8 +27,7 @@
 
 ## 1. Funktionsumfang
 
- - Auffinden von tapo SmartHome Geräten im Netzwerk.  
- - Einfaches Anlegen von dem benötigten Geräte Instanzen, oder den Konfiguratoren mit Gateway Instanzen.  
+ - Instanz für Smarte WiFi Zwischenstecker (ohne Energiemessung)
  
 ## 2. Voraussetzungen
 
@@ -38,35 +39,63 @@
   
 ## 4. Einrichten der Instanzen in IP-Symcon
 
-Eine einfache Einrichtung ist über diese Instanz möglich.  
-Bei der installation aus dem Store wird das anlegen der Instanz automatisch angeboten.  
+Eine einfache Einrichtung ist die [Discovery-Instanz](../Tapo%20Discovery/README.md) möglich.  
 
 Bei der manuellen Einrichtung ist das Modul im Dialog `Instanz hinzufügen` unter den Hersteller `TP-Link` zu finden.  
 ![Instanz hinzufügen](../imgs/module.png)  
 
-Alternativ ist es auch in der Liste alle Discovery-Module aufgeführt.  
-![Instanz hinzufügen](../imgs/module_discovery.png)  
-
-Die Suche im Netzwerk nutzt einen Broadcast auf Port 20002.
-
 Damit Symcon mit den Geräten kommunizieren können, müssen diese in der TP-Link Cloud angemeldet und registriert sein.  
-Die entsprechenden Cloud-Zugangsdaten sind in der Discovery-Instanz einzutragen, damit die Instanzen gleich mit den korrekten Daten erstellt werden.  
+Die entsprechenden Cloud-Zugangsdaten, die MAC-Adresse und das genutzte Protokoll werden beim anlegen durch die [Discovery-Instanz](../Tapo%20Discovery/README.md) automatisch eingetragen.
+
  ### Konfigurationsseite <!-- omit in toc -->
 
-Über das selektieren eines Eintrages in der Tabelle und betätigen des dazugehörigen `Erstellen` Button,  
-wird automatisch eine [Geräte-Instanz](../README.md#2-geräte-instanzen) erzeugt, sofern es sich **nicht** um einen Smart Hub handelt.  
-Bei einem Smart Hub wird eine [Konfigurator-Instanz](../Tapo%20Configurator/README.md) und eine, [Gateway-Instanz](../Tapo%20Gateway/README.md) erzeugt.  
+![Config](../imgs/conf_device.png)  
 
-![Discovery](../imgs/conf_discovery.png)  
 **Benutzername und Passwort sind die Cloud/App Zugangsdaten!**  
+
+| Name       | Text                           | Beschreibung                                                           |
+| ---------- | ------------------------------ | ---------------------------------------------------------------------- |
+| Open       | Aktiv                          | Verbindung zu Gerät herstellen                                         |
+| Host       | Host                           | Adresse des Gerätes                                                    |
+| Mac        | MAC Adresse                    | MAC Adresse des Gerätes (benötigt die Discovery-Instanz zur Zuordnung) |
+| Protocol   | Protokoll                      | Genutztes Kommunikationsprotokoll (AES oder KLAP)                      |
+| Username   | Benutzername                   | Benutzername für die Anmeldung (TP-Cloud Benutzername: eMail-Adresse)  |
+| Password   | Passwort                       | Passwort für die Anmeldung (TP-Cloud Passwort)                         |
+| Interval   | Leseintervall                  | Intervall der Abfrage von Status und Energiewerten (in Sekunden)       |
+| AutoRename | Instanz automatisch umbenennen | Instanz erhält den Namen, welcher in der App vergeben wurde            |
 
 ## 5. Statusvariablen und Profile
 
-Dieses Modul erstellt keine Statusvariablen und Profile.  
+Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
+
+### Statusvariablen
+| Ident     | Name   | Typ     |
+| --------- | ------ | ------- |
+| device_on | Status | boolean |
+| rssi      | Rssi   | integer |
+
+
+### Profile
+
+Dieses Modul erstellt keine Profile.  
 
 ## 6. PHP-Befehlsreferenz
 
-Dieses Modul besitzt keine Instanz-Funktionen.
+``` php
+boolean TAPOSH_SwitchMode(integer $InstanzID, bool $State);
+```
+---  
+``` php
+boolean TAPOSH_SwitchModeEx(integer $InstanzID, bool $State, integer $Delay);
+```
+---  
+``` php
+boolean TAPOSH_RequestState(integer $InstanzID);
+```
+---  
+``` php
+array|false TAPOSH_GetDeviceInfo(integer $InstanzID);
+```
 
 ## 7. Aktionen
 

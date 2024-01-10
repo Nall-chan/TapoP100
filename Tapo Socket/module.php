@@ -5,20 +5,21 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
- * TapoP100 Klasse für die Anbindung von TP-Link tapo P100 / P110 Smart Sockets.
+ * TapoSocket Klasse für die Anbindung von TP-Link tapo Smarte WiFi Sockets.
  * Erweitert IPSModule.
  *
  * @author        Michael Tröger <micha@nall-chan.net>
- * @copyright     2023 Michael Tröger
+ * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.50
- *
- * @example <b>Ohne</b>
- *
+ * @version       1.60
  */
-class TapoP100 extends \TpLink\Device
+class TapoSocket extends \TpLink\Device
 {
+    protected static $ModuleIdents = [
+        '\TpLink\VariableIdent'
+    ];
+
     public function ApplyChanges()
     {
         // Migrate Old 'State' Var to 'device_on' Var
@@ -30,27 +31,8 @@ class TapoP100 extends \TpLink\Device
         //Never delete this line!
         parent::ApplyChanges();
 
-        $this->RegisterVariableBoolean(\TpLink\VariableIdent::device_on, $this->Translate(\TpLink\VariableIdent::$DefaultIdents[\TpLink\VariableIdent::device_on][\TpLink\IPSVarName]), '~Switch');
+        $this->RegisterVariableBoolean(\TpLink\VariableIdent::device_on, $this->Translate(\TpLink\VariableIdent::$Variables[\TpLink\VariableIdent::device_on][\TpLink\IPSVarName]), '~Switch');
         $this->EnableAction(\TpLink\VariableIdent::device_on);
-    }
-
-    public function RequestAction($Ident, $Value)
-    {
-        switch ($Ident) {
-            case \TpLink\VariableIdent::device_on:
-                $this->SwitchMode((bool) $Value);
-                return;
-        }
-    }
-
-    public function RequestState()
-    {
-        $Result = $this->GetDeviceInfo();
-        if (is_array($Result)) {
-            $this->SetValue(\TpLink\VariableIdent::device_on, $Result[\TpLink\VariableIdent::device_on]);
-            return true;
-        }
-        return false;
     }
 
     public function SwitchMode(bool $State): bool
@@ -85,17 +67,6 @@ class TapoP100 extends \TpLink\Device
             return false;
         }
         $this->SetValue(\TpLink\VariableIdent::device_on, $State);
-        return true;
-    }
-
-    protected function SetStatus($Status)
-    {
-        if ($this->GetStatus() != $Status) {
-            parent::SetStatus($Status);
-            if ($Status == IS_ACTIVE) {
-                $this->RequestState();
-            }
-        }
         return true;
     }
 }

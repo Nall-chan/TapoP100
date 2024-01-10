@@ -19,8 +19,8 @@ Einbindung der TP-Link tapo SmartHome Geräte
     - [tapo Gateway](#tapo-gateway)
   - [2. Geräte Instanzen](#2-geräte-instanzen)
     - [tapo Light](#tapo-light)
-    - [tapo P100](#tapo-p100)
-    - [tapo P110](#tapo-p110)
+    - [tapo Socket](#tapo-socket)
+    - [tapo Energy Socket](#tapo-energy-socket)
 - [2. Voraussetzungen](#2-voraussetzungen)
 - [3. Software-Installation](#3-software-installation)
 - [4. Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
@@ -51,10 +51,10 @@ Einbindung der TP-Link tapo SmartHome Geräte
 ### [tapo Light](Tapo%20Light/README.md)  
   *  Lampe und LED Strip  
 
-### [tapo P100](Tapo%20P100/README.md)  
+### [tapo Socket](Tapo%20Socket/README.md)  
   *  WiFi Smart Socket  
 
-### [tapo P110](Tapo%20P110/README.md)  
+### [tapo Energy Socket](Tapo%20Energy%20Socket/README.md)  
   *  WiFi Smart Sockets mit Energiemessung   
   
 # 2. Voraussetzungen

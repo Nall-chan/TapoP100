@@ -8,13 +8,19 @@ require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
  * TapoDiscovery
+ * TapoDiscovery Klasse für das auffinden von Geräten im Netzwerk.
  *
+ * @author        Michael Tröger <micha@nall-chan.net>
+ * @copyright     2024 Michael Tröger
+ * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+ *
+ * @version       1.60
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
  *
  */
 class TapoDiscovery extends IPSModule
 {
-    use \TapoP100\DebugHelper;
+    use \Tapo\DebugHelper;
 
     public const DISCOVERY_TIMEOUT = 3;
     public function Create(): void

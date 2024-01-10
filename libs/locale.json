@@ -2,6 +2,8 @@
     "translations": {
         "de": {
             "tapo Light": "tapo Licht",
+            "tapo Socket": "tapo Steckdose",
+            "tapo Energy Socket": "tapo Mess-Steckdose",
             "Error on reconnect": "Fehler beim neuverbinden",
             "Not connected": "Nicht verbunden",
             "Invalid Public Key Length": "Ungültige Länge des öffentlichen Schlüssels",
