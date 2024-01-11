@@ -151,7 +151,7 @@ class TapoDiscovery extends IPSModule
                     continue;
                 }
                 $Data = substr($response, 16);
-                $this->SendDebug('Receive (' . $IPAddress . ')', $Data, 0);
+                $this->SendDebug('Receive (' . $IPAddress . ':' . $Port . ')', $Data, 0);
                 $JsonReceive = json_decode($Data, true);
                 if (!$JsonReceive) {
                     continue;
