@@ -49,6 +49,14 @@ class TapoDiscovery extends IPSModule
             return json_encode($Form);
         }
 
+        if (IPS_GetOption('NATSupport') && strpos(IPS_GetKernelPlatform(), 'Docker')) {
+            // not supported. Docker cannot forward Broadcast :(
+            $Form['actions'][2]['popup']['items'][1]['caption'] = $this->Translate("The combination of Docker and NAT is not supported because Broadcasts are not possible.\r\nPlease run the container in the host network.\r\nOr create and configure the required tapo instances manually.");
+            $Form['actions'][2]['visible'] = true;
+            $this->SendDebug('FORM', json_encode($Form), 0);
+            $this->SendDebug('FORM', json_last_error_msg(), 0);
+            return json_encode($Form);
+        }
         $Form['actions'][0]['items'][0]['items'][0]['value'] = $this->ReadAttributeString(\TpLink\Attribute::Username);
         $Form['actions'][0]['items'][0]['items'][1]['value'] = $this->ReadAttributeString(\TpLink\Attribute::Password);
         $Form['actions'][1]['values'] = $this->GetDevices();
@@ -135,10 +143,10 @@ class TapoDiscovery extends IPSModule
             socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);
             socket_set_option($socket, IPPROTO_IP, IP_MULTICAST_TTL, 5);
             socket_set_option($socket, SOL_SOCKET, SO_BROADCAST, 1);
-            socket_bind($socket, '0.0.0.0', 0);
+            socket_bind($socket, '0.0.0.0', 20002);
             $discoveryTimeout = time() + self::DISCOVERY_TIMEOUT;
             $this->SendDebug('Search', $Payload, 0);
-            if (@socket_sendto($socket, $Payload, strlen($Payload), 0, '255.255.255.255', 20002) === false) {
+            if (@socket_sendto($socket, $Payload, strlen($Payload), 0, '255.255.255.255', 0) === false) {
                 $this->SendDebug('Error', 'on send discovery message', 0);
                 @socket_close($socket);
                 return [];
