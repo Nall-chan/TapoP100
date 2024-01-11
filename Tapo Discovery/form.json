@@ -74,12 +74,13 @@
                     {
                         "name": "ErrorTitle",
                         "type": "Label",
+                        "bold": true,
                         "caption": "No Devices found!"
                     },
                     {
                         "name": "ErrorText",
                         "type": "Label",
-                        "caption": "No devices were found.\r\nTo recognize devices, incoming multicast on port 1901 (UDP) must be forwarded to IPS.\r\nPlease configure the firewall or routing accordingly."
+                        "caption": "The combination of Docker and NAT is not supported because Broadcasts are not possible.\r\nPlease run the container in the host network.\r\nOr create and configure the required tapo instances manually."
                     }
                 ]
             }

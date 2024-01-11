@@ -48,10 +48,8 @@ class TapoDiscovery extends IPSModule
         if ($this->GetStatus() == IS_CREATING) {
             return json_encode($Form);
         }
-
         if (IPS_GetOption('NATSupport') && strpos(IPS_GetKernelPlatform(), 'Docker')) {
             // not supported. Docker cannot forward Broadcast :(
-            $Form['actions'][2]['popup']['items'][1]['caption'] = $this->Translate("The combination of Docker and NAT is not supported because Broadcasts are not possible.\r\nPlease run the container in the host network.\r\nOr create and configure the required tapo instances manually.");
             $Form['actions'][2]['visible'] = true;
             $this->SendDebug('FORM', json_encode($Form), 0);
             $this->SendDebug('FORM', json_last_error_msg(), 0);
@@ -59,7 +57,7 @@ class TapoDiscovery extends IPSModule
         }
         $Form['actions'][0]['items'][0]['items'][0]['value'] = $this->ReadAttributeString(\TpLink\Attribute::Username);
         $Form['actions'][0]['items'][0]['items'][1]['value'] = $this->ReadAttributeString(\TpLink\Attribute::Password);
-        $Form['actions'][1]['values'] = $this->GetDevices();
+        //$Form['actions'][1]['values'] = $this->GetDevices();
         $this->SendDebug('FORM', json_encode($Form), 0);
         $this->SendDebug('FORM', json_last_error_msg(), 0);
 
