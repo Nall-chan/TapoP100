@@ -57,7 +57,7 @@ class TapoDiscovery extends IPSModule
         }
         $Form['actions'][0]['items'][0]['items'][0]['value'] = $this->ReadAttributeString(\TpLink\Attribute::Username);
         $Form['actions'][0]['items'][0]['items'][1]['value'] = $this->ReadAttributeString(\TpLink\Attribute::Password);
-        //$Form['actions'][1]['values'] = $this->GetDevices();
+        $Form['actions'][1]['values'] = $this->GetDevices();
         $this->SendDebug('FORM', json_encode($Form), 0);
         $this->SendDebug('FORM', json_last_error_msg(), 0);
 
@@ -141,10 +141,10 @@ class TapoDiscovery extends IPSModule
             socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);
             socket_set_option($socket, IPPROTO_IP, IP_MULTICAST_TTL, 5);
             socket_set_option($socket, SOL_SOCKET, SO_BROADCAST, 1);
-            socket_bind($socket, '0.0.0.0', 20002);
+            socket_bind($socket, '0.0.0.0', 0);
             $discoveryTimeout = time() + self::DISCOVERY_TIMEOUT;
             $this->SendDebug('Search', $Payload, 0);
-            if (@socket_sendto($socket, $Payload, strlen($Payload), 0, '255.255.255.255', 0) === false) {
+            if (@socket_sendto($socket, $Payload, strlen($Payload), 0, '255.255.255.255', 20002) === false) {
                 $this->SendDebug('Error', 'on send discovery message', 0);
                 @socket_close($socket);
                 return [];
@@ -157,7 +157,7 @@ class TapoDiscovery extends IPSModule
                     continue;
                 }
                 $Data = substr($response, 16);
-                $this->SendDebug('Receive (' . $IPAddress . ':' . $Port . ')', $Data, 0);
+                $this->SendDebug('Receive (' . $IPAddress . ':' . ')', $Data, 0);
                 $JsonReceive = json_decode($Data, true);
                 if (!$JsonReceive) {
                     continue;
