@@ -27,7 +27,7 @@
 
 ## 1. Funktionsumfang
 
- - Instanz für Lampen und LED-Stripes  
+ - Instanz für Lampen und LED-Stripes mit Farbe  
  
 ## 2. Voraussetzungen
 
