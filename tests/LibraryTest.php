@@ -30,4 +30,9 @@ class LibraryTest extends TestCaseSymconValidation
     {
         $this->validateModule(__DIR__ . '/../Tapo Light');
     }
+
+    public function testValidateLightColor(): void
+    {
+        $this->validateModule(__DIR__ . '/../Tapo Light Color');
+    }
 }

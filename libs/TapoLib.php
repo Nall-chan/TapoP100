@@ -171,6 +171,7 @@ namespace TpLink
         public const PlugP100 = 'P100';
         public const PlugP110 = 'P110';
         public const BulbL530 = 'L530';
+        public const BulbL610 = 'L610';
         public const KH100 = 'KH100';
     }
 
@@ -179,14 +180,17 @@ namespace TpLink
         public const Plug = '{AAD6F48D-C23F-4C59-8049-A9746DEB699B}';
         public const PlugEnergy = '{B18B6CAA-AB46-495D-9A7A-85FA3A83113A}';
         public const BulbL530 = '{3C59DCC3-4441-4E1C-A59C-9F8D26CE2E82}';
-        public const KH100 = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
+        public const BulbL610 = '{1B9D73D6-853D-4E2E-9755-2273FD7A6123}';
+        //public const KH100 = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
 
         public static $TapoDevices = [
             DeviceModel::PlugP100 => self::Plug,
             DeviceModel::PlugP110 => self::PlugEnergy,
             DeviceModel::BulbL530 => self::BulbL530,
-            DeviceModel::KH100    => self::KH100,
+            DeviceModel::BulbL610 => self::BulbL610,
+            //DeviceModel::KH100    => self::KH100,
         ];
+
         public static function GetByModel(string $Model)
         {
             if (!array_key_exists($Model, self::$TapoDevices)) {
@@ -255,6 +259,27 @@ namespace TpLink
     {
         public const overheated = 'overheated';
         public const brightness = 'brightness';
+
+        public static $Variables = [
+            self::overheated=> [
+                IPSVarName   => 'Overheated',
+                IPSVarType   => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile=> '~Alert',
+                HasAction    => false
+            ],
+            self::brightness=> [
+                IPSVarName   => 'Brightness',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> VariableProfile::Brightness,
+                HasAction    => true
+            ]
+        ];
+    }
+
+    class VariableIdentLightColor
+    {
+        public const overheated = 'overheated';
+        public const brightness = 'brightness';
         public const hue = 'hue';
         public const saturation = 'saturation';
         public const color_temp = 'color_temp';
@@ -290,7 +315,6 @@ namespace TpLink
             ],
         ];
     }
-
     class VariableIdentTrv
     {
         public const target_temp = 'target_temp';
