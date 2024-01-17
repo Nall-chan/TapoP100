@@ -198,7 +198,7 @@ namespace TpLink
             DeviceModel::BulbL530 => self::BulbL530,
             DeviceModel::BulbL610 => self::BulbL610,
             DeviceModel::KH100    => self::PlugsMulti,
-            DeviceModel::H100    => self::PlugsMulti,
+            DeviceModel::H100     => self::PlugsMulti,
         ];
 
         public static function GetByModel(string $Model)

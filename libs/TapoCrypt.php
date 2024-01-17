@@ -98,14 +98,14 @@ namespace TpLink\Crypt
         private function Login(): bool
         {
             $Url = \TpLink\Api\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Api\Url::App;
-            $Payload = \TpLink\Api\Protocol::BuildRequest(
+            $Payload = json_encode(\TpLink\Api\Protocol::BuildRequest(
                 \TpLink\Api\Method::Login,
                 '',
                 [
                     \TpLink\Api\Param::Password => base64_encode($this->ReadPropertyString(\TpLink\Property::Password)),
                     \TpLink\Api\Param::Username => base64_encode(sha1($this->ReadPropertyString(\TpLink\Property::Username)))
                 ]
-            );
+            ));
             $this->SendDebug(__FUNCTION__, $Payload, 0);
             $tp_link_cipher = new \TpLink\Crypt\Cipher($this->TpLinkCipherKey, $this->TpLinkCipherIV);
             $EncryptedPayload = $tp_link_cipher->encrypt($Payload);
