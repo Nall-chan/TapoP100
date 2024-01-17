@@ -179,6 +179,7 @@ namespace TpLink
         public const BulbL530 = 'L530';
         public const BulbL610 = 'L610';
         public const KH100 = 'KH100';
+        public const H100 = 'H100';
     }
 
     class GUID
@@ -197,6 +198,7 @@ namespace TpLink
             DeviceModel::BulbL530 => self::BulbL530,
             DeviceModel::BulbL610 => self::BulbL610,
             DeviceModel::KH100    => self::PlugsMulti,
+            DeviceModel::H100    => self::PlugsMulti,
         ];
 
         public static function GetByModel(string $Model)
