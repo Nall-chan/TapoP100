@@ -49,20 +49,11 @@ class TapoEnergySocket extends TapoSocket
 
     public function GetEnergyUsage()
     {
-        $Request = json_encode([
-            'method'         => 'get_energy_usage',
-            'requestTimeMils'=> 0
-        ]);
-        $this->SendDebug(__FUNCTION__, $Request, 0);
+        $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::GetEnergyUsage);
         $Response = $this->SendRequest($Request);
-        if ($Response === '') {
+        if ($Response === null) {
             return false;
         }
-        $json = json_decode($Response, true);
-        if ($json['error_code'] != 0) {
-            trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json['error_code']], E_USER_NOTICE);
-            return false;
-        }
-        return $json['result'];
+        return $Response;
     }
 }

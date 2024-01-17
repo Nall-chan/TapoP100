@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/libs/TapoLib.php';
+require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 
 /**
  * TapoLightlb Klasse für die Anbindung von TP-Link tapo WiFi Bulbs & Strips.
@@ -30,7 +30,7 @@ class TapoLightColor extends \TpLink\Device
     }
 
     /**
-     * HSVtoRGB
+     * HSVtoRGB ReceiveFunction
      *
      * not static, falls wir doch auf Statusvariablen zurückgreifen müssen
      *
@@ -100,7 +100,7 @@ class TapoLightColor extends \TpLink\Device
     }
 
     /**
-     * RGBtoHSV
+     * RGBtoHSV SendFunction
      *
      * not static, falls wir doch auf Statusvariablen zurückgreifen müssen
      *

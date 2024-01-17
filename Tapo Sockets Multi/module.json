@@ -1,0 +1,12 @@
+{
+    "id": "{C923F554-4621-446E-B0D2-1422F2EB84B5}",
+    "name": "tapo Multi Sockets",
+    "type": 3,
+    "vendor": "TP-Link",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "TAPOSH",
+    "url": "https://github.com/Nall-chan/tapoSmartHome"
+}

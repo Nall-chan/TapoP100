@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use TpLink\GUID;
 
-require_once dirname(__DIR__) . '/libs/TapoLib.php';
+require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 
 /**
  * TapoDiscovery

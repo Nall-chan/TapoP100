@@ -76,6 +76,10 @@ Es wird empfohlen die Einrichtung mit der Discovery-Instanz zu starten ([tapo Di
 
 ## 1. Changelog
 
+Version 1.61:
+ - P300 Steckdosenleiste ergänzt.  
+ - Refactoring der 1.60 um weiterer Geräte und den Smart Hub zu integrieren  
+  
 Version 1.60:
  - Discovery Modul zum einfachen auffinden von Geräten im Netzwerk ergänzt  
  - tapo Light Modul ergänzt  

@@ -21,6 +21,11 @@ class LibraryTest extends TestCaseSymconValidation
         $this->validateModule(__DIR__ . '/../Tapo Socket');
     }
 
+    public function testValidateSocketaMulti(): void
+    {
+        $this->validateModule(__DIR__ . '/../Tapo Sockets Multi');
+    }
+
     public function testValidateEnergySocket(): void
     {
         $this->validateModule(__DIR__ . '/../Tapo Energy Socket');

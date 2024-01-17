@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/libs/TapoLib.php';
+require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 
 /**
  * TapoSocket Klasse für die Anbindung von TP-Link tapo Smarte WiFi Sockets.
@@ -51,22 +51,15 @@ class TapoSocket extends \TpLink\Device
             'desired_states'=> [
                 'on' => $State
             ],
-            'enable'   => true,
-            'remain'   => $Delay
+            'enable'   => true
         ];
         $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::CountdownRule, $this->terminalUUID, $Params);
 
-        $this->SendDebug(__FUNCTION__, $Request, 0);
         $Response = $this->SendRequest($Request);
-        if ($Response === '') {
+        if ($Response === null) {
             return false;
         }
-        $json = json_decode($Response, true);
-        if ($json[\TpLink\Api\ErrorCode] != 0) {
-            trigger_error(\TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]], E_USER_NOTICE);
-            return false;
-        }
-        $this->SetValue(\TpLink\VariableIdent::device_on, $State);
+        //$this->SetValue(\TpLink\VariableIdent::device_on, $State);
         return true;
     }
 }

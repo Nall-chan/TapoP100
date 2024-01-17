@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/libs/TapoLib.php';
+require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 
 /**
  * TapoLightlb Klasse für die Anbindung von TP-Link tapo WiFi Bulbs & Strips.
