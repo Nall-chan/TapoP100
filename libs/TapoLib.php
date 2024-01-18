@@ -4,24 +4,15 @@ declare(strict_types=1);
 
 namespace TpLink\Api
 {
-    const Protocol = 'http://';
     const ErrorCode = 'error_code';
     const Result = 'result';
-
-    class Url
-    {
-        public const App = '/app';
-        public const InitKlap = self::App . '/handshake1';
-        public const HandshakeKlap = self::App . '/handshake2';
-        public const KlapRequest = self::App . '/request?';
-    }
 
     class Method
     {
         // Connection
         public const Handshake = 'handshake';
         public const Login = 'login_device';
-        public const SecurePassthrough = 'securePassthrough';
+
         public const MultipleRequest = 'multipleRequest';
 
         // Get/Set Values
@@ -140,26 +131,6 @@ namespace TpLink\Api
             ]);
         }
     }
-
-    class TpProtocol
-    {
-        private const Token = 'token';
-        private const Request = 'request';
-
-        public static function GetUrlWithToken(string $Host, string $Token): string
-        {
-            return Protocol . $Host . Url::App . '?' . http_build_query([self::Token => $Token]);
-        }
-
-        public static function BuildSecurePassthroughRequest(string $EncryptedPayload): string
-        {
-            return json_encode([
-                Protocol::Method=> Method::SecurePassthrough,
-                Protocol::Params=> [
-                    self::Request=> $EncryptedPayload
-                ]]);
-        }
-    }
 }
 
 namespace TpLink
@@ -173,13 +144,34 @@ namespace TpLink
 
     class DeviceModel
     {
-        public const PlugP100 = 'P100';
-        public const PlugP110 = 'P110';
-        public const PlugP300 = 'P300';
-        public const BulbL530 = 'L530';
-        public const BulbL610 = 'L610';
-        public const KH100 = 'KH100';
-        public const H100 = 'H100';
+        public const PlugP100 = 'P100'; // WLAN-Steckdose
+        public const PlugP110 = 'P110'; // WLAN Steckdose mit Messung
+        public const PlugP115 = 'P115'; // WLAN-Steckdose Rund mit Verbrauchsanzeige
+        public const PlugP300 = 'P300'; // WLAN Power-Strip
+        public const BulbL510 = 'L510'; // E27-Glühbirne, dimmbar
+        public const BulbL520 = 'L520'; // E27-Glühbirne, dimmbar
+        public const BulbL530 = 'L530'; // E27-Glühbirne, mehrfarbig
+        public const BulbL535 = 'L535'; // E27-Glühbirne, mehrfarbig
+        public const BulbL610 = 'L610'; // Wi-Fi Strahler, dimmbar
+        public const BulbL630 = 'L630'; // Wi-Fi-Strahler, mehrfarbig
+        public const StripeL900 = 'L900'; // Wi-Fi Light Strip RGB
+        public const StripeL920 = 'L920'; // Wi-Fi Light Strip Multifarben
+        public const StripeL930 = 'L930'; // Wi-Fi Light Strip RGB , Mehrfarbig
+        public const H100 = 'H100'; // Hub mit integrierter Sirene
+        public const H200 = 'H200'; // Hub mit LAN
+    }
+
+    class HubChildDevicesModel
+    {
+        public const KE100 = 'KE100'; // Heizkörperthermostat
+        public const T100 = 'T100'; // Bewegungsmelder
+        public const T110 = 'T110'; // Intelligenter Kontaktsensor
+        public const T300 = 'T300'; // Wasserlecksensor
+        public const T310 = 'T310'; // Temperatur- & Feuchtigkeitsmonitor
+        public const T315 = 'T315'; // Temperatur- & Feuchtigkeitsmonitor mit Display
+        public const S200 = 'S200'; // Remote Button oder Dimmschalter
+        public const S210 = 'S210'; // Lichtschalter 1-fach
+        public const S220 = 'S220'; // Lichtschalter 2-fach
     }
 
     class GUID
@@ -187,18 +179,27 @@ namespace TpLink
         public const Plug = '{AAD6F48D-C23F-4C59-8049-A9746DEB699B}';
         public const PlugEnergy = '{B18B6CAA-AB46-495D-9A7A-85FA3A83113A}';
         public const PlugsMulti = '{C923F554-4621-446E-B0D2-1422F2EB84B5}';
-        public const BulbL530 = '{3C59DCC3-4441-4E1C-A59C-9F8D26CE2E82}';
-        public const BulbL610 = '{1B9D73D6-853D-4E2E-9755-2273FD7A6123}';
-        //public const KH100 = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
+        public const BulbColor = '{3C59DCC3-4441-4E1C-A59C-9F8D26CE2E82}';
+        public const BulbWithe = '{1B9D73D6-853D-4E2E-9755-2273FD7A6123}';
+        public const Hub = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
+        public const HubConfigurator = '{CA1E7005-E5D1-455C-95DF-5ECE8DC50654}';
+        public const HubSendToChild = '{A982FDFB-9576-4DAE-9341-5ADCA8B05326}';
+        public const ChildSendToHub = '{5377F7F9-4F55-486C-AA61-C4203190065F}';
+        public const HubChild = '{DBBC5150-EF75-487B-9407-27C11DDEF6B4}';
 
         public static $TapoDevices = [
             DeviceModel::PlugP100 => self::Plug,
             DeviceModel::PlugP110 => self::PlugEnergy,
+            DeviceModel::PlugP115 => self::PlugEnergy,
             DeviceModel::PlugP300 => self::PlugsMulti,
-            DeviceModel::BulbL530 => self::BulbL530,
-            DeviceModel::BulbL610 => self::BulbL610,
-            DeviceModel::KH100    => self::PlugsMulti,
-            DeviceModel::H100     => self::PlugsMulti,
+            DeviceModel::BulbL510 => self::BulbWithe,
+            DeviceModel::BulbL520 => self::BulbWithe,
+            DeviceModel::BulbL530 => self::BulbColor,
+            DeviceModel::BulbL535 => self::BulbColor,
+            DeviceModel::BulbL610 => self::BulbWithe,
+            DeviceModel::BulbL630 => self::BulbColor,
+            DeviceModel::H100     => self::HubConfigurator,
+            DeviceModel::H200     => self::HubConfigurator,
         ];
 
         public static function GetByModel(string $Model)
@@ -222,6 +223,7 @@ namespace TpLink
         public const Interval = 'Interval';
         public const AutoRename = 'AutoRename';
         public const Protocol = 'Protocol';
+        public const DeviceId = 'DeviceId';
     }
 
     class Attribute

@@ -33,6 +33,43 @@ namespace {
 
 namespace TpLink\Crypt
 {
+    const Protocol = 'http://';
+
+    class Url
+    {
+        public const App = '/app';
+        public const InitKlap = self::App . '/handshake1';
+        public const HandshakeKlap = self::App . '/handshake2';
+        public const KlapRequest = self::App . '/request?';
+    }
+
+    class Method
+    {
+        public const SecurePassthrough = 'securePassthrough';
+    }
+
+    class Protocol
+    {
+        private const Method = 'method';
+        private const Params = 'params';
+        private const Token = 'token';
+        private const Request = 'request';
+
+        public static function GetUrlWithToken(string $Host, string $Token): string
+        {
+            return Protocol . $Host . Url::App . '?' . http_build_query([self::Token => $Token]);
+        }
+
+        public static function BuildSecurePassthroughRequest(string $EncryptedPayload): string
+        {
+            return json_encode([
+                self::Method=> Method::SecurePassthrough,
+                self::Params=> [
+                    self::Request=> $EncryptedPayload
+                ]]);
+        }
+    }
+
     class Cipher
     {
         private $key;
@@ -71,7 +108,7 @@ namespace TpLink\Crypt
             $Key = (new \phpseclib\Crypt\RSA())->createKey(1024);
             $privateKey = $Key['privatekey'];
             $publicKey = $Key['publickey'];
-            $Url = \TpLink\Api\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Api\Url::App;
+            $Url = \TpLink\Crypt\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Crypt\Url::App;
             $Payload = \TpLink\Api\Protocol::BuildHandshakeRequest($publicKey);
             $this->SendDebug('Handshake', $Payload, 0);
             $this->cookie = '';
@@ -97,7 +134,7 @@ namespace TpLink\Crypt
 
         private function Login(): bool
         {
-            $Url = \TpLink\Api\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Api\Url::App;
+            $Url = \TpLink\Crypt\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Crypt\Url::App;
             $Payload = json_encode(\TpLink\Api\Protocol::BuildRequest(
                 \TpLink\Api\Method::Login,
                 '',
@@ -109,7 +146,7 @@ namespace TpLink\Crypt
             $this->SendDebug(__FUNCTION__, $Payload, 0);
             $tp_link_cipher = new \TpLink\Crypt\Cipher($this->TpLinkCipherKey, $this->TpLinkCipherIV);
             $EncryptedPayload = $tp_link_cipher->encrypt($Payload);
-            $SecurePassthroughPayload = \TpLink\Api\TpProtocol::BuildSecurePassthroughRequest($EncryptedPayload);
+            $SecurePassthroughPayload = \TpLink\Crypt\Protocol::BuildSecurePassthroughRequest($EncryptedPayload);
             $Result = $this->CurlRequest($Url, $SecurePassthroughPayload);
             if ($Result === false) {
                 return false;
@@ -128,10 +165,10 @@ namespace TpLink\Crypt
 
         private function EncryptedRequest(string $Payload): string
         {
-            $Url = \TpLink\Api\TpProtocol::GetUrlWithToken($this->ReadPropertyString(\TpLink\Property::Host), $this->token);
+            $Url = \TpLink\Crypt\Protocol::GetUrlWithToken($this->ReadPropertyString(\TpLink\Property::Host), $this->token);
             $tp_link_cipher = new \TpLink\Crypt\Cipher($this->TpLinkCipherKey, $this->TpLinkCipherIV);
             $EncryptedPayload = $tp_link_cipher->encrypt($Payload);
-            $SecurePassthroughPayload = \TpLink\Api\TpProtocol::BuildSecurePassthroughRequest($EncryptedPayload);
+            $SecurePassthroughPayload = \TpLink\Crypt\Protocol::BuildSecurePassthroughRequest($EncryptedPayload);
             $Result = $this->CurlRequest($Url, $SecurePassthroughPayload);
             if ($Result === false) {
                 return '';
@@ -230,7 +267,7 @@ namespace TpLink\Crypt
                 $this->ReadPropertyString(\TpLink\Property::Username),
                 $this->ReadPropertyString(\TpLink\Property::Password)
             );
-            $Url = \TpLink\Api\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Api\Url::InitKlap;
+            $Url = \TpLink\Crypt\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Crypt\Url::InitKlap;
             $Payload = random_bytes(16);
             $this->SendDebug('Init Klap', $Payload, 0);
             $this->cookie = '';
@@ -278,7 +315,7 @@ namespace TpLink\Crypt
 
         private function HandshakeKlap(): bool
         {
-            $Url = \TpLink\Api\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Api\Url::HandshakeKlap;
+            $Url = \TpLink\Crypt\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Crypt\Url::HandshakeKlap;
             $Payload = hash('sha256', $this->KlapRemoteSeed . $this->KlapLocalSeed . $this->KlapUserHash, true);
             $Result = $this->CurlRequest($Url, $Payload, true);
             $this->SendDebug('Klap Handshake Result', $Result, 0);
@@ -299,7 +336,7 @@ namespace TpLink\Crypt
             $TpKlapCipher = new \TpLink\Crypt\KlapCipher($this->KlapLocalSeed, $this->KlapRemoteSeed, $this->KlapUserHash, $this->KlapSequenz);
             $EncryptedPayload = $TpKlapCipher->encrypt($Payload);
             $this->KlapSequenz = $TpKlapCipher->getSequenz();
-            $Url = \TpLink\Api\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Api\Url::KlapRequest . http_build_query(['seq'=>$this->KlapSequenz]);
+            $Url = \TpLink\Crypt\Protocol . $this->ReadPropertyString(\TpLink\Property::Host) . \TpLink\Crypt\Url::KlapRequest . http_build_query(['seq'=>$this->KlapSequenz]);
             $Result = $this->CurlRequest($Url, $EncryptedPayload);
             if ($Result === false) {
                 if (!$this->Init()) {

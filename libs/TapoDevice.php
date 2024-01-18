@@ -346,6 +346,7 @@ namespace TpLink
                 }
             }
             $Result = null;
+            $JSON = '';
             if ($this->KlapRemoteSeed !== '') {
                 $JSON = $this->KlapEncryptedRequest($Request);
             }
@@ -460,7 +461,7 @@ namespace TpLink
             curl_setopt($ch, CURLOPT_POSTFIELDS, $Payload);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 4000);
             curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
             curl_setopt($ch, CURLOPT_COOKIELIST, $this->cookie);
             $Result = curl_exec($ch);

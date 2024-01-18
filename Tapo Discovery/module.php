@@ -182,7 +182,15 @@ class TapoDiscovery extends IPSModule
         foreach (\TpLink\GUID::$TapoDevices as $GUID) {
             $InstanceIDList = IPS_GetInstanceListByModuleID($GUID);
             foreach ($InstanceIDList as $InstanceID) {
-                $Devices[$InstanceID] = strtoupper(IPS_GetProperty($InstanceID, \TpLink\Property::Mac));
+                if ($GUID == \TpLink\GUID::HubConfigurator) {
+                    $Devices[$InstanceID] = '';
+                    $ConnectionID = IPS_GetInstance($InstanceID)['ConnectionID'];
+                    if (IPS_InstanceExists($ConnectionID)) {
+                        $Devices[$InstanceID] = strtoupper(IPS_GetProperty($ConnectionID, \TpLink\Property::Mac));
+                    }
+                } else {
+                    $Devices[$InstanceID] = strtoupper(IPS_GetProperty($InstanceID, \TpLink\Property::Mac));
+                }
             }
         }
         return $Devices;

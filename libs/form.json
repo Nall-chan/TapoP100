@@ -69,6 +69,11 @@
     ],
     "actions": [
         {
+            "type": "Button",
+            "caption": "Request device state",
+            "onClick": "TAPOSH_RequestState($id);"
+        },
+        {
             "type": "TestCenter"
         },
         {
@@ -113,6 +118,7 @@
             "Read interval": "Leseintervall",
             "seconds": "Sekunden",
             "Auto rename instance": "Instanz automatisch umbenennen",
+            "Request device state": "Gerätezustand lesen",
             "Not connected": "Nicht verbunden",
             "Error on reconnect": "Fehler beim neuverbinden",
             "This module contains 'phpseclib - PHP Secure Communications Library' (https://github.com/phpseclib/phpseclib)": "Dieses Modul enthält 'phpseclib - PHP Secure Communications Library' (https://github.com/phpseclib/phpseclib)",

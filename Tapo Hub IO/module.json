@@ -1,0 +1,16 @@
+{
+    "id": "{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}",
+    "name": "tapo Hub IO",
+    "type": 1,
+    "vendor": "TP-Link",
+    "aliases": [],
+    "parentRequirements": [
+        "{5377F7F9-4F55-486C-AA61-C4203190065F}"
+    ],
+    "childRequirements": [
+        "{A982FDFB-9576-4DAE-9341-5ADCA8B05326}"
+    ],
+    "implemented": [],
+    "prefix": "TAPOSH",
+    "url": "https://github.com/Nall-chan/tapoSmartHome"
+}
