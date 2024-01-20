@@ -1,50 +1,18 @@
 {
     "actions": [
         {
-            "type": "ExpansionPanel",
-            "caption": "Credentials",
-            "expanded": true,
-            "items": [
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "name": "Username",
-                            "type": "ValidationTextBox",
-                            "caption": "Username"
-                        },
-                        {
-                            "name": "Password",
-                            "type": "PasswordTextBox",
-                            "caption": "Password"
-                        },
-                        {
-                            "onClick": "IPS_RequestAction($id,'Save',urlencode($Username).':'.urlencode($Password));",
-                            "type": "Button",
-                            "caption": "Save & Reload"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "type": "Configurator",
-            "name": "Discovery",
+            "name": "Configurator",
             "add": false,
             "delete": true,
             "sort": {
-                "column": "host",
+                "column": "DeviceId",
                 "direction": "ascending"
             },
             "columns": [
                 {
-                    "caption": "Hostname",
-                    "name": "host",
-                    "width": "200px"
-                },
-                {
-                    "caption": "MAC",
-                    "name": "mac",
+                    "caption": "Device ID",
+                    "name": "DeviceId",
                     "width": "200px"
                 },
                 {
@@ -54,36 +22,16 @@
                 },
                 {
                     "caption": "Type",
-                    "name": "device_type",
+                    "name": "type",
                     "width": "200px"
                 },
                 {
                     "caption": "Model",
-                    "name": "device_model",
+                    "name": "model",
                     "width": "200px"
                 }
             ],
             "values": []
-        },
-        {
-            "name": "ErrorPopup",
-            "type": "PopupAlert",
-            "visible": false,
-            "popup": {
-                "items": [
-                    {
-                        "name": "ErrorTitle",
-                        "type": "Label",
-                        "bold": true,
-                        "caption": "No Devices found!"
-                    },
-                    {
-                        "name": "ErrorText",
-                        "type": "Label",
-                        "caption": "The combination of Docker and NAT is not supported because Broadcasts are not possible.\r\nPlease run the container in the host network.\r\nOr create and configure the required tapo instances manually."
-                    }
-                ]
-            }
         },
         {
             "type": "Label",

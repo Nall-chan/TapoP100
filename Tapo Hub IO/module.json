@@ -4,13 +4,13 @@
     "type": 1,
     "vendor": "TP-Link",
     "aliases": [],
-    "parentRequirements": [
-        "{5377F7F9-4F55-486C-AA61-C4203190065F}"
-    ],
+    "parentRequirements": [],
     "childRequirements": [
         "{A982FDFB-9576-4DAE-9341-5ADCA8B05326}"
     ],
-    "implemented": [],
+    "implemented": [
+        "{5377F7F9-4F55-486C-AA61-C4203190065F}"
+    ],
     "prefix": "TAPOSH",
     "url": "https://github.com/Nall-chan/tapoSmartHome"
 }

@@ -17,7 +17,10 @@ require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 class TapoMultiSockets extends \TpLink\Device
 {
     protected static $ModuleIdents = [
-        '\TpLink\VariableIdent'
+        \TpLink\VariableIdent\OnOff,
+        \TpLink\VariableIdent\Overheated,
+        \TpLink\VariableIdent\Rssi,
+        \TpLink\VariableIdent\Socket
     ];
 
     public function ApplyChanges()
@@ -73,8 +76,8 @@ class TapoMultiSockets extends \TpLink\Device
             return false;
         }
         $Values[\TpLink\Api\Result::DeviceID] = $this->ChildIDs[$Index];
-        $Values[\TpLink\VariableIdent::device_on] = $State;
-        $Ident = 'Pos_' . $Index . '_' . \TpLink\VariableIdent::device_on;
+        $Values[\TpLink\VariableIdentOnOff::device_on] = $State;
+        $Ident = 'Pos_' . $Index . '_' . \TpLink\VariableIdentOnOff::device_on;
         if ($this->SetDeviceInfo($Values)) {
             $this->SetValue($Ident, $State);
             return true;
@@ -91,7 +94,7 @@ class TapoMultiSockets extends \TpLink\Device
             return false;
         }
         $ChildID = $this->ChildIDs[$Index];
-        $Values[\TpLink\VariableIdent::device_on] = $State;
+        $Values[\TpLink\VariableIdentOnOff::device_on] = $State;
 
         $Params = [
             'delay'         => $Delay,

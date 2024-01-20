@@ -17,7 +17,10 @@ require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 class TapoSocket extends \TpLink\Device
 {
     protected static $ModuleIdents = [
-        '\TpLink\VariableIdent'
+        \TpLink\VariableIdent\OnOff,
+        \TpLink\VariableIdent\Overheated,
+        \TpLink\VariableIdent\Rssi,
+        \TpLink\VariableIdent\Socket
     ];
 
     public function ApplyChanges()
@@ -25,20 +28,20 @@ class TapoSocket extends \TpLink\Device
         // Migrate Old 'State' Var to 'device_on' Var
         $oldVar = @$this->GetIDForIdent('State');
         if (IPS_VariableExists($oldVar)) {
-            IPS_SetIdent($oldVar, \TpLink\VariableIdent::device_on);
+            IPS_SetIdent($oldVar, \TpLink\VariableIdentOnOff::device_on);
         }
 
         //Never delete this line!
         parent::ApplyChanges();
 
-        $this->RegisterVariableBoolean(\TpLink\VariableIdent::device_on, $this->Translate(\TpLink\VariableIdent::$Variables[\TpLink\VariableIdent::device_on][\TpLink\IPSVarName]), '~Switch');
-        $this->EnableAction(\TpLink\VariableIdent::device_on);
+        //$this->RegisterVariableBoolean(\TpLink\VariableIdentOnOff::device_on, $this->Translate(\TpLink\VariableIdentOnOff::$Variables[\TpLink\VariableIdentOnOff::device_on][\TpLink\IPSVarName]), '~Switch');
+        //$this->EnableAction(\TpLink\VariableIdentOnOff::device_on);
     }
 
     public function SwitchMode(bool $State): bool
     {
-        if ($this->SetDeviceInfo([\TpLink\VariableIdent::device_on => $State])) {
-            $this->SetValue(\TpLink\VariableIdent::device_on, $State);
+        if ($this->SetDeviceInfo([\TpLink\VariableIdentOnOff::device_on => $State])) {
+            $this->SetValue(\TpLink\VariableIdentOnOff::device_on, $State);
             return true;
         }
         return false;
@@ -59,7 +62,6 @@ class TapoSocket extends \TpLink\Device
         if ($Response === null) {
             return false;
         }
-        //$this->SetValue(\TpLink\VariableIdent::device_on, $State);
         return true;
     }
 }

@@ -55,6 +55,7 @@ namespace TpLink
             $this->RegisterTimer(\TpLink\Timer::RequestState, 0, 'TAPOSH_RequestState($_IPS[\'TARGET\']);');
             $this->terminalUUID = self::guidv4();
             $this->InitBuffers();
+            $this->ChildIDs = [];
         }
 
         public function Destroy()
@@ -65,7 +66,6 @@ namespace TpLink
 
         public function ApplyChanges()
         {
-            $this->ChildIDs = [];
             $this->RegisterProfileInteger(\TpLink\VariableProfile::RuntimeSeconds, '', '', ' seconds', 0, 0, 0);
             $this->SetTimerInterval(\TpLink\Timer::RequestState, 0);
             $this->SetSummary($this->ReadPropertyString(\TpLink\Property::Host));
@@ -96,7 +96,7 @@ namespace TpLink
             if (array_key_exists($SendIdent, $AllIdents)) {
                 if ($AllIdents[$SendIdent][\TpLink\HasAction]) {
                     $Values[$SendIdent] = $Value;
-                    if ($this->SetDeviceInfoVariables($Values)) {
+                    if ($this->SendInfoVariables($Values)) {
                         $this->SetValue($Ident, $Value);
                     }
                 }
@@ -145,7 +145,7 @@ namespace TpLink
         {
             // ControlChild
             /*
-            $ChildValue = [\TpLink\VariableIdent::device_on => false];
+            $ChildValue = [\TpLink\VariableIdentOnOff::device_on => false];
             $ChildRequest = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::SetDeviceInfo, '', $ChildValue);
             $Values = [
                 'device_id'  => '8022B958FB2A8894109B291806AE20F12107CD8101',
@@ -258,7 +258,7 @@ namespace TpLink
             return true;
         }
 
-        protected function SetDeviceInfoVariables(array $Values)
+        protected function SendInfoVariables(array $Values)
         {
             $SendValues = [];
             if (array_key_exists(\TpLink\api\Result::DeviceID, $Values)) {
@@ -301,22 +301,36 @@ namespace TpLink
             if ($Response === null) {
                 return false;
             }
+            if (isset($ChildRequestValues)) {
+                $Error_code = $Response[\TpLink\Api\Result::ResponseData][\TpLink\Api\ErrorCode];
+                if ($Error_code != 0) {
+                    if (array_key_exists($Error_code, \TpLink\Api\Protocol::$ErrorCodes)) {
+                        $msg = \TpLink\Api\Protocol::$ErrorCodes[$Error_code];
+                    } else {
+                        $msg = $Error_code;
+                    }
+                    set_error_handler([$this, 'ModulErrorHandler']);
+                    trigger_error($this->Translate($msg), E_USER_NOTICE);
+                    restore_error_handler();
+                    return false;
+                }
+            }
             return true;
         }
 
         /*protected function SetAutOff(string $Value)
         {
-            $Values[\TpLink\VariableIdent::auto_off_remain_time] = 0;
-            $Values[\TpLink\VariableIdent::auto_off_status] = 'off';
+            $Values[\TpLink\VariableIdentSocket::auto_off_remain_time] = 0;
+            $Values[\TpLink\VariableIdentSocket::auto_off_status] = 'off';
             return $Values;
         }*/
 
         protected function SecondsToString(array $Values)
         {
-            if (!isset($Values[\TpLink\VariableIdent::on_time])) {
+            if (!isset($Values[\TpLink\VariableIdentSocket::on_time])) {
                 return null;
             }
-            return sprintf(gmdate('H \%\s i \%\s', $Values[\TpLink\VariableIdent::on_time]), $this->Translate('hours'), $this->Translate('minutes'));
+            return sprintf(gmdate('H \%\s i \%\s', $Values[\TpLink\VariableIdentSocket::on_time]), $this->Translate('hours'), $this->Translate('minutes'));
         }
 
         /**
@@ -396,6 +410,7 @@ namespace TpLink
             echo $errstr . PHP_EOL;
             return true;
         }
+
         private function GetModuleIdents()
         {
             $AllIdents = [];

@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
-use TpLink\GUID;
-
-require_once dirname(__DIR__) . '/libs/TapoDevice.php';
+eval('declare(strict_types=1);namespace TapoDiscovery {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
+require_once dirname(__DIR__) . '/libs/TapoCrypt.php';
+require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
  * TapoDiscovery
@@ -20,7 +19,7 @@ require_once dirname(__DIR__) . '/libs/TapoDevice.php';
  */
 class TapoDiscovery extends IPSModule
 {
-    use \Tapo\DebugHelper;
+    use \TapoDiscovery\DebugHelper;
 
     public const DISCOVERY_TIMEOUT = 3;
     public function Create(): void
@@ -89,7 +88,7 @@ class TapoDiscovery extends IPSModule
                 ];
                 unset($IPSDevices[$InstanceID]);
             } else {
-                $Guid = \TpLink\GUID::GetByModel($Device[\TpLink\Api\Result::DeviceModel]);
+                $Guid = \TpLink\DeviceModel::GetGuidByDeviceModel($Device[\TpLink\Api\Result::DeviceModel]);
                 if (!$Guid) {
                     continue;
                 }
@@ -116,8 +115,19 @@ class TapoDiscovery extends IPSModule
             ];
         }
         foreach ($IPSDevices as $InstanceID => $Mac) {
+            $GUID = IPS_GetInstance($InstanceID)['ModuleInfo']['ModuleID'];
+            if ($GUID == \TpLink\GUID::HubConfigurator) {
+                $Host = '';
+                $ConnectionID = IPS_GetInstance($InstanceID)['ConnectionID'];
+                if (IPS_InstanceExists($ConnectionID)) {
+                    $Host = IPS_GetProperty($ConnectionID, \TpLink\Property::Host);
+                }
+            } else {
+                $Host = IPS_GetProperty($InstanceID, \TpLink\Property::Host);
+            }
+
             $Values[] = [
-                'host'               => IPS_GetProperty($InstanceID, \TpLink\Property::Host),
+                'host'               => $Host,
                 'mac'                => $Mac,
                 'name'               => IPS_GetName($InstanceID),
                 'device_type'        => '',
@@ -179,7 +189,7 @@ class TapoDiscovery extends IPSModule
     private function GetIPSInstances(): array
     {
         $Devices = [];
-        foreach (\TpLink\GUID::$TapoDevices as $GUID) {
+        foreach (\TpLink\DeviceModel::$DeviceModels as $GUID) {
             $InstanceIDList = IPS_GetInstanceListByModuleID($GUID);
             foreach ($InstanceIDList as $InstanceID) {
                 if ($GUID == \TpLink\GUID::HubConfigurator) {

@@ -61,7 +61,9 @@ namespace TpLink\Api
         public const Ip = 'ip';
         public const Mac = 'mac';
         public const DeviceType = 'device_type';
+        public const Type = 'type';
         public const DeviceModel = 'device_model';
+        public const Model = 'model';
         public const DeviceID = 'device_id';
         public const MGT = 'mgt_encrypt_schm';
         public const Protocol = 'encrypt_type';
@@ -69,6 +71,7 @@ namespace TpLink\Api
         public const Position = 'position';
         public const SlotNumber = 'slot_number';
         public const ResponseData = 'responseData';
+        public const Category = 'category';
     }
 
     class Protocol
@@ -133,6 +136,21 @@ namespace TpLink\Api
     }
 }
 
+namespace TpLink\VariableIdent
+{
+    const OnOff = '\TpLink\VariableIdentOnOff';
+    const Overheated = '\TpLink\VariableIdentOverheated';
+    const Socket = '\TpLink\VariableIdentSocket';
+    const Rssi = '\TpLink\VariableIdentRssi';
+    const Light = '\TpLink\VariableIdentLight';
+    const LightColor = '\TpLink\VariableIdentLightColor';
+    const Humidity = '\TpLink\VariableIdentHumidity';
+    const Online = '\TpLink\VariableIdentOnline';
+    const Temp = '\TpLink\VariableIdentTemp';
+    const Battery = '\TpLink\VariableIdentBattery';
+    const Trv = '\TpLink\VariableIdentTrv';
+}
+
 namespace TpLink
 {
     const IPSVarName = 'IPSVarName';
@@ -145,6 +163,7 @@ namespace TpLink
     class DeviceModel
     {
         public const PlugP100 = 'P100'; // WLAN-Steckdose
+        public const PlugP105 = 'P105'; // WLAN Steckdose Rund
         public const PlugP110 = 'P110'; // WLAN Steckdose mit Messung
         public const PlugP115 = 'P115'; // WLAN-Steckdose Rund mit Verbrauchsanzeige
         public const PlugP300 = 'P300'; // WLAN Power-Strip
@@ -152,13 +171,42 @@ namespace TpLink
         public const BulbL520 = 'L520'; // E27-Glühbirne, dimmbar
         public const BulbL530 = 'L530'; // E27-Glühbirne, mehrfarbig
         public const BulbL535 = 'L535'; // E27-Glühbirne, mehrfarbig
-        public const BulbL610 = 'L610'; // Wi-Fi Strahler, dimmbar
-        public const BulbL630 = 'L630'; // Wi-Fi-Strahler, mehrfarbig
+        public const BulbL610 = 'L610'; // Wi-Fi Strahler GU10, dimmbar
+        public const BulbL630 = 'L630'; // Wi-Fi-Strahler GU10, mehrfarbig
         public const StripeL900 = 'L900'; // Wi-Fi Light Strip RGB
-        public const StripeL920 = 'L920'; // Wi-Fi Light Strip Multifarben
-        public const StripeL930 = 'L930'; // Wi-Fi Light Strip RGB , Mehrfarbig
+        public const StripeL920 = 'L920'; // Wi-Fi Light Strip Multifarben ? Zonen
+        public const StripeL930 = 'L930'; // Wi-Fi Light Strip RGBW , Multifarben 50 Zonen
+        public const KH100 = 'KH100'; // Hub mit integrierter Sirene
         public const H100 = 'H100'; // Hub mit integrierter Sirene
         public const H200 = 'H200'; // Hub mit LAN
+
+        public static $DeviceModels = [
+            self::PlugP100    => GUID::Plug,
+            self::PlugP105    => GUID::Plug,
+            self::PlugP110    => GUID::PlugEnergy,
+            self::PlugP115    => GUID::PlugEnergy,
+            self::PlugP300    => GUID::PlugsMulti,
+            self::BulbL510    => GUID::BulbWithe,
+            self::BulbL520    => GUID::BulbWithe,
+            self::BulbL530    => GUID::BulbColor,
+            self::BulbL535    => GUID::BulbColor,
+            self::BulbL610    => GUID::BulbWithe,
+            self::BulbL630    => GUID::BulbColor,
+            self::StripeL900  => GUID::BulbColor,
+            self::KH100       => GUID::HubConfigurator,
+            self::H100        => GUID::HubConfigurator,
+            self::H200        => GUID::HubConfigurator,
+        ];
+
+        public static function GetGuidByDeviceModel(string $Model): string
+        {
+            $Model = explode(' ', $Model)[0];
+            $Model = explode('(', $Model)[0];
+            if (!array_key_exists($Model, self::$DeviceModels)) {
+                return false;
+            }
+            return self::$DeviceModels[$Model];
+        }
     }
 
     class HubChildDevicesModel
@@ -172,6 +220,63 @@ namespace TpLink
         public const S200 = 'S200'; // Remote Button oder Dimmschalter
         public const S210 = 'S210'; // Lichtschalter 1-fach
         public const S220 = 'S220'; // Lichtschalter 2-fach
+
+        public static $DeviceModels = [
+            self::KE100 => GUID::HubChild,
+            self::T100  => GUID::HubChild,
+            self::T110  => GUID::HubChild,
+            self::T300  => GUID::HubChild,
+            self::T310  => GUID::HubChild,
+            self::T315  => GUID::HubChild,
+            self::S200  => GUID::HubChild,
+            self::S210  => GUID::HubChild,
+            self::S220  => GUID::HubChild
+        ];
+
+        public static function GetGuidByDeviceModel(string $Model): string
+        {
+            $Model = explode(' ', $Model)[0];
+            $Model = explode('(', $Model)[0];
+            if (!array_key_exists($Model, self::$DeviceModels)) {
+                return false;
+            }
+            return self::$DeviceModels[$Model];
+        }
+    }
+
+    class HubChildDevicesCategory
+    {
+        public const TRV = 'trv';
+        public const TempHmdtSensor = 'temp-hmdt-sensor';
+
+        private static $Idents = [
+            self::TempHmdtSensor => [
+                VariableIdent\Online,
+                VariableIdent\Battery,
+                VariableIdent\Humidity,
+                VariableIdent\Rssi,
+                VariableIdent\Temp
+            ],
+            self::TRV => [
+                VariableIdent\Online,
+                VariableIdent\Battery,
+                VariableIdent\Rssi,
+                VariableIdent\Temp,
+                VariableIdent\Trv
+            ],
+        ];
+
+        public static function GetVariableIdentsByCategory(string $Category): array
+        {
+            $AllIdents = [];
+            if (array_key_exists($Category, self::$Idents)) {
+                foreach (self::$Idents[$Category] as $VariableIdentClassName) {
+                    /** @var VariableIdent $VariableIdentClassName */
+                    $AllIdents = array_merge($AllIdents, $VariableIdentClassName::$Variables);
+                }
+            }
+            return $AllIdents;
+        }
     }
 
     class GUID
@@ -186,31 +291,6 @@ namespace TpLink
         public const HubSendToChild = '{A982FDFB-9576-4DAE-9341-5ADCA8B05326}';
         public const ChildSendToHub = '{5377F7F9-4F55-486C-AA61-C4203190065F}';
         public const HubChild = '{DBBC5150-EF75-487B-9407-27C11DDEF6B4}';
-
-        public static $TapoDevices = [
-            DeviceModel::PlugP100 => self::Plug,
-            DeviceModel::PlugP110 => self::PlugEnergy,
-            DeviceModel::PlugP115 => self::PlugEnergy,
-            DeviceModel::PlugP300 => self::PlugsMulti,
-            DeviceModel::BulbL510 => self::BulbWithe,
-            DeviceModel::BulbL520 => self::BulbWithe,
-            DeviceModel::BulbL530 => self::BulbColor,
-            DeviceModel::BulbL535 => self::BulbColor,
-            DeviceModel::BulbL610 => self::BulbWithe,
-            DeviceModel::BulbL630 => self::BulbColor,
-            DeviceModel::H100     => self::HubConfigurator,
-            DeviceModel::H200     => self::HubConfigurator,
-        ];
-
-        public static function GetByModel(string $Model)
-        {
-            $Model = explode(' ', $Model)[0];
-            $Model = explode('(', $Model)[0];
-            if (!array_key_exists($Model, self::$TapoDevices)) {
-                return false;
-            }
-            return self::$TapoDevices[$Model];
-        }
     }
 
     class Property
@@ -230,6 +310,7 @@ namespace TpLink
     {
         public const Username = 'Username';
         public const Password = 'Password';
+        public const Category = 'Category';
     }
 
     class Timer
@@ -237,15 +318,9 @@ namespace TpLink
         public const RequestState = 'RequestState';
     }
 
-    class VariableIdent
+    class VariableIdentOnOff
     {
         public const device_on = 'device_on';
-        public const on_time = 'on_time';
-        public const on_time_string = 'on_time_string';
-        //public const auto_off_status = 'auto_off_status';
-        //public const auto_off_remain_time = 'auto_off_remain_time';
-        public const rssi = 'rssi'; //todo
-        public const overheated = 'overheated';
 
         public static $Variables = [
             self::device_on=> [
@@ -253,7 +328,32 @@ namespace TpLink
                 IPSVarType   => VARIABLETYPE_BOOLEAN,
                 IPSVarProfile=> VariableProfile::Switch,
                 HasAction    => true
-            ],
+            ]
+        ];
+    }
+
+    class VariableIdentOverheated
+    {
+        public const overheated = 'overheated';
+
+        public static $Variables = [
+            self::overheated=> [
+                IPSVarName   => 'Overheated',
+                IPSVarType   => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile=> '~Alert',
+                HasAction    => false
+            ]
+        ];
+    }
+
+    class VariableIdentSocket
+    {
+        public const on_time = 'on_time';
+        public const on_time_string = 'on_time_string';
+        //public const auto_off_status = 'auto_off_status';
+        //public const auto_off_remain_time = 'auto_off_remain_time';
+
+        public static $Variables = [
             self::on_time=> [
                 IPSVarName   => 'On time (seconds)',
                 IPSVarType   => VARIABLETYPE_INTEGER,
@@ -282,12 +382,14 @@ namespace TpLink
                 IPSVarProfile=> VariableProfile::UnixTimestampTime,
                 HasAction    => true
             ],*/
-            self::overheated=> [
-                IPSVarName   => 'Overheated',
-                IPSVarType   => VARIABLETYPE_BOOLEAN,
-                IPSVarProfile=> '~Alert',
-                HasAction    => false
-            ],
+        ];
+    }
+
+    class VariableIdentRssi
+    {
+        public const rssi = 'rssi';
+
+        public static $Variables = [
             self::rssi => [
                 IPSVarName              => 'Rssi',
                 IPSVarType              => VARIABLETYPE_INTEGER,
@@ -295,17 +397,6 @@ namespace TpLink
                 HasAction               => false
             ]
         ];
-    }
-
-    class VariableIdentEnergySocket
-    {
-        public const today_runtime = 'today_runtime';
-        public const month_runtime = 'month_runtime';
-        public const today_runtime_raw = 'today_runtime_raw';
-        public const month_runtime_raw = 'month_runtime_raw';
-        public const today_energy = 'today_energy';
-        public const month_energy = 'month_energy';
-        public const current_power = 'current_power';
     }
 
     class VariableIdentLight
@@ -339,12 +430,6 @@ namespace TpLink
                 IPSVarProfile=> '~Alert',
                 HasAction    => false
             ],
-            self::brightness=> [
-                IPSVarName   => 'Brightness',
-                IPSVarType   => VARIABLETYPE_INTEGER,
-                IPSVarProfile=> VariableProfile::Brightness,
-                HasAction    => true
-            ],
             self::color_temp=> [
                 IPSVarName   => 'Color temp',
                 IPSVarType   => VARIABLETYPE_INTEGER,
@@ -362,10 +447,72 @@ namespace TpLink
         ];
     }
 
+    class VariableIdentOnline
+    {
+        public const status = 'status';
+
+        public static $Variables = [
+            self::status => [
+                IPSVarName              => 'Online status',
+                IPSVarType              => VARIABLETYPE_STRING,
+                IPSVarProfile           => '',
+                HasAction               => false
+            ]
+        ];
+    }
+
+    class VariableIdentHumidity
+    {
+        public const current_humidity = 'current_humidity';
+
+        public static $Variables = [
+            self::current_humidity=> [
+                IPSVarName   => 'Current humidity',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> VariableProfile::Humidity,
+                HasAction    => false
+            ]
+        ];
+    }
+
+    class VariableIdentTemp
+    {
+        public const current_temp = 'current_temp';
+
+        public static $Variables = [
+            self::current_temp=> [
+                IPSVarName   => 'Current temperature',
+                IPSVarType   => VARIABLETYPE_FLOAT,
+                IPSVarProfile=> VariableProfile::Temperature,
+                HasAction    => false
+            ]
+        ];
+    }
+
+    class VariableIdentBattery
+    {
+        public const at_low_battery = 'at_low_battery';
+        public const battery_percentage = 'battery_percentage';
+
+        public static $Variables = [
+            self::at_low_battery=> [
+                IPSVarName   => 'Low battery',
+                IPSVarType   => VARIABLETYPE_BOOLEAN,
+                IPSVarProfile=> VariableProfile::BatteryLow,
+                HasAction    => false
+            ],
+            self::battery_percentage=> [
+                IPSVarName   => 'Battery',
+                IPSVarType   => VARIABLETYPE_INTEGER,
+                IPSVarProfile=> VariableProfile::Battery,
+                HasAction    => false
+            ]
+        ];
+    }
+
     class VariableIdentTrv
     {
         public const target_temp = 'target_temp';
-        public const temp_offset = 'temp_offset';
         public const frost_protection_on = 'frost_protection_on';
         public const child_protection = 'child_protection';
 
@@ -400,7 +547,11 @@ namespace TpLink
         public const Switch = '~Switch';
         public const HexColor = '~HexColor';
         public const UnixTimestampTime = '~UnixTimestampTime';
-        public const TargetTemperature = '~Temperature.Room';
+        public const TargetTemperature = '~Temperature.HM';
+        public const Temperature = '~Temperature';
+        public const Humidity = '~Humidity';
+        public const Battery = '~Battery.100';
+        public const BatteryLow = '~Battery';
     }
 
     class KelvinTable
@@ -449,7 +600,7 @@ namespace TpLink
             6500=> [255, 249, 253]
         ];
 
-        public static function ToRGB(int $Kelvin)
+        public static function ToRGB(int $Kelvin): array
         {
             foreach (self::$Table as $Key => $RGB) {
                 if ($Key < $Kelvin) {

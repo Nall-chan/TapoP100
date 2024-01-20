@@ -17,8 +17,10 @@ require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 class TapoLight extends \TpLink\Device
 {
     protected static $ModuleIdents = [
-        '\TpLink\VariableIdent',
-        '\TpLink\VariableIdentLight'
+        \TpLink\VariableIdent\OnOff,
+        \TpLink\VariableIdent\Overheated,
+        \TpLink\VariableIdent\Rssi,
+        \TpLink\VariableIdent\Light
     ];
 
     public function ApplyChanges()
