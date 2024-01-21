@@ -72,37 +72,42 @@ class TapoDiscovery extends IPSModule
         $this->SendDebug('IPS Devices', $IPSDevices, 0);
         $Values = [];
         foreach ($Devices as $Device) {
-            $InstanceID = false;
+            $Guid = \TpLink\DeviceModel::GetGuidByDeviceModel($Device[\TpLink\Api\Result::DeviceModel]);
+            if (!$Guid) {
+                continue;
+            }
             $InstanceID = array_search(strtoupper($Device[\TpLink\Api\Result::Mac]), $IPSDevices);
             if ($InstanceID) {
-                $Create = [
-                    'moduleID'         => IPS_GetInstance($InstanceID)['ModuleInfo']['ModuleID'],
-                    'configuration'    => [
-                        \TpLink\Property::Open           => IPS_GetProperty($InstanceID, \TpLink\Property::Open),
-                        \TpLink\Property::Host           => $Device[\TpLink\Api\Result::Ip],
-                        \TpLink\Property::Mac            => IPS_GetProperty($InstanceID, \TpLink\Property::Mac),
-                        \TpLink\Property::Username       => $this->ReadAttributeString(\TpLink\Attribute::Username),
-                        \TpLink\Property::Password       => $this->ReadAttributeString(\TpLink\Attribute::Password),
-                        \TpLink\Property::Protocol       => $Device[\TpLink\Api\Result::MGT][\TpLink\Api\Result::Protocol]
-                    ]
-                ];
+                $Open = false;
+                if ($Guid == \TpLink\GUID::HubConfigurator) {
+                    $Guid = \TpLink\GUID::Hub;
+                    $ConnectionID = IPS_GetInstance($InstanceID)['ConnectionID'];
+                    if (IPS_InstanceExists($ConnectionID)) {
+                        $Open = IPS_GetProperty($ConnectionID, \TpLink\Property::Open);
+                    }
+                } else {
+                    $Open = IPS_GetProperty($InstanceID, \TpLink\Property::Open);
+                }
                 unset($IPSDevices[$InstanceID]);
             } else {
-                $Guid = \TpLink\DeviceModel::GetGuidByDeviceModel($Device[\TpLink\Api\Result::DeviceModel]);
-                if (!$Guid) {
-                    continue;
-                }
-                $Create = [
-                    'moduleID'                => $Guid,
-                    'configuration'           => [
-                        \TpLink\Property::Open           => true,
-                        \TpLink\Property::Host           => $Device[\TpLink\Api\Result::Ip],
-                        \TpLink\Property::Mac            => $Device[\TpLink\Api\Result::Mac],
-                        \TpLink\Property::Username       => $this->ReadAttributeString(\TpLink\Attribute::Username),
-                        \TpLink\Property::Password       => $this->ReadAttributeString(\TpLink\Attribute::Password),
-                        \TpLink\Property::Protocol       => $Device[\TpLink\Api\Result::MGT][\TpLink\Api\Result::Protocol]
-                    ]
-                ];
+                $Open = true;
+            }
+            $Create = [
+                'moduleID'                => $Guid,
+                'configuration'           => [
+                    \TpLink\Property::Open           => $Open,
+                    \TpLink\Property::Host           => $Device[\TpLink\Api\Result::Ip],
+                    \TpLink\Property::Mac            => $Device[\TpLink\Api\Result::Mac],
+                    \TpLink\Property::Username       => $this->ReadAttributeString(\TpLink\Attribute::Username),
+                    \TpLink\Property::Password       => $this->ReadAttributeString(\TpLink\Attribute::Password),
+                    \TpLink\Property::Protocol       => $Device[\TpLink\Api\Result::MGT][\TpLink\Api\Result::Protocol]
+                ]
+            ];
+            if ($Guid == \TpLink\GUID::Hub) {
+                $Create = [[
+                    'moduleID'                => \TpLink\GUID::HubConfigurator,
+                    'configuration'           => new stdClass()
+                ], $Create];
             }
             $Values[] = [
                 'host'               => $Device[\TpLink\Api\Result::Ip],
@@ -116,8 +121,8 @@ class TapoDiscovery extends IPSModule
         }
         foreach ($IPSDevices as $InstanceID => $Mac) {
             $GUID = IPS_GetInstance($InstanceID)['ModuleInfo']['ModuleID'];
+            $Host = '';
             if ($GUID == \TpLink\GUID::HubConfigurator) {
-                $Host = '';
                 $ConnectionID = IPS_GetInstance($InstanceID)['ConnectionID'];
                 if (IPS_InstanceExists($ConnectionID)) {
                     $Host = IPS_GetProperty($ConnectionID, \TpLink\Property::Host);

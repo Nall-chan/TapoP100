@@ -537,7 +537,23 @@ namespace TpLink
             ],
         ];
     }
-
+    /*
+        // channel group alarm
+        public static final String CHANNEL_GROUP_ALARM = "alarm";
+        public static final String CHANNEL_ALARM_ACTIVE = "alarmActive";
+        public static final String CHANNEL_ALARM_SOURCE = "alarmSource";
+        public static final String CHANNEL_GROUP_SENSOR = "sensor";
+        public static final String CHANNEL_IS_OPEN = "isOpen";
+        public static final String CHANNEL_TEMPERATURE = "currentTemp";
+        public static final String CHANNEL_HUMIDITY = "currentHumidity";
+        // hub child events
+        public static final String EVENT_BATTERY_LOW = "batteryIsLow";
+        public static final String EVENT_CONTACT_OPENED = "contactOpened";
+        public static final String EVENT_CONTACT_CLOSED = "contactClosed";
+        public static final String EVENT_STATE_BATTERY_LOW = "batteryLow";
+        public static final String EVENT_STATE_OPENED = "open";
+        public static final String EVENT_STATE_CLOSED = "closed";
+     */
     class VariableProfile
     {
         public const Runtime = 'Tapo.Runtime';
