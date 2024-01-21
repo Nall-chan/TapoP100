@@ -49,8 +49,8 @@ class TapoHubIO extends \TpLink\Device
                     'requestData'=> \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::GetDeviceInfo)
                 ];
                 $Request = \TpLink\Api\Protocol::BuildRequest(\TpLink\Api\Method::ControlChild, $this->terminalUUID, $Values);
-                //$Response = $this->SendRequest($Request);
-                $Response = json_decode(file_get_contents(dirname(__DIR__) . '/tests/get_info_' . $ChildID . '.json'), true)['result'];
+                $Response = $this->SendRequest($Request);
+                //$Response = json_decode(file_get_contents(dirname(__DIR__) . '/tests/get_info_' . $ChildID . '.json'), true)['result'];
                 if ($Response === null) {
                     continue;
                 }
