@@ -90,6 +90,9 @@ class TapoDiscovery extends IPSModule
                 }
                 unset($IPSDevices[$InstanceID]);
             } else {
+                if ($Guid == \TpLink\GUID::HubConfigurator) {
+                    $Guid = \TpLink\GUID::Hub;
+                }
                 $Open = true;
             }
             $Create = [
