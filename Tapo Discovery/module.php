@@ -73,7 +73,7 @@ class TapoDiscovery extends IPSModule
         $Values = [];
         foreach ($Devices as $Device) {
             $Guid = \TpLink\DeviceModel::GetGuidByDeviceModel($Device[\TpLink\Api\Result::DeviceModel]);
-            if (!$Guid) {
+            if ($Guid == '') {
                 continue;
             }
             $InstanceID = array_search(strtoupper($Device[\TpLink\Api\Result::Mac]), $IPSDevices);

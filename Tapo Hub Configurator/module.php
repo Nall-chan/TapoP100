@@ -111,8 +111,13 @@ class TapoHubConfigurator extends IPSModule
             return [];
         }
         $List = $Result[\TpLink\Api\Result::ChildList];
-        foreach ($List as &$ChildDevice) {
-            $ChildDevice['moduleID'] = \TpLink\HubChildDevicesModel::GetGuidByDeviceModel($ChildDevice[\TpLink\Api\Result::Model]);
+        foreach ($List as $Index => $ChildDevice) {
+            $Guid = \TpLink\HubChildDevicesModel::GetGuidByDeviceModel($ChildDevice[\TpLink\Api\Result::Model]);
+            if ($Guid) {
+                $List[$Index]['moduleID'] = $Guid;
+            } else {
+                unset($List[$Index]);
+            }
         }
         return $List;
     }

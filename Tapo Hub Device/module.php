@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 eval('declare(strict_types=1);namespace TapoHubDevice {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/DebugHelper.php') . '}');
+eval('declare(strict_types=1);namespace TapoHubDevice {?>' . file_get_contents(dirname(__DIR__) . '/libs/helper/VariableProfileHelper.php') . '}');
 require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
@@ -15,16 +16,19 @@ require_once dirname(__DIR__) . '/libs/TapoLib.php';
  * @version       1.60
  *
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
+ * @method void RegisterProfileFloat(string $Name, string $Icon, string $Prefix, string $Suffix, float $MinValue, float $MaxValue, float $StepSize, int $Digits)
  */
 class TapoHubDevice extends IPSModule
 {
     use \TapoHubDevice\DebugHelper;
+    use \TapoHubDevice\VariableProfileHelper;
 
     public function Create()
     {
         $this->RegisterPropertyString(\TpLink\Property::DeviceId, '');
         $this->RegisterPropertyBoolean(\TpLink\Property::AutoRename, false);
         $this->RegisterAttributeString(\TpLink\Attribute::Category, '');
+        //Tapo.Temperature.Room
     }
 
     public function Destroy()
@@ -37,6 +41,8 @@ class TapoHubDevice extends IPSModule
     {
         //Never delete this line!
         parent::ApplyChanges();
+
+        $this->RegisterProfileFloat(\TpLink\VariableProfile::TargetTemperature, 'Temperature', '', ' °C', 5, 30, 0.5, 1);
 
         $DeviceId = $this->ReadPropertyString(\TpLink\Property::DeviceId);
         if ($DeviceId) {
@@ -186,5 +192,14 @@ class TapoHubDevice extends IPSModule
             return [];
         }
         return \TpLink\HubChildDevicesCategory::GetVariableIdentsByCategory($Category);
+    }
+
+    private function TrvStateToString(array $Values)
+    {
+        $State = array_shift($Values[\TpLink\VariableIdentTrv::trv_states]);
+        if (!$State) {
+            $State = '';
+        }
+        return $State;
     }
 }

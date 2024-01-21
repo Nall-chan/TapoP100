@@ -200,12 +200,13 @@ namespace TpLink
 
         public static function GetGuidByDeviceModel(string $Model): string
         {
-            $Model = explode(' ', $Model)[0];
-            $Model = explode('(', $Model)[0];
-            if (!array_key_exists($Model, self::$DeviceModels)) {
-                return false;
+            $Match = [];
+            if (preg_match('/^[a-zA-Z]{2}\d{3}/', $Model, $Match)) {
+                if (array_key_exists($Match[0], self::$DeviceModels)) {
+                    return self::$DeviceModels[$Match[0]];
+                }
             }
-            return self::$DeviceModels[$Model];
+            return '';
         }
     }
 
@@ -235,12 +236,13 @@ namespace TpLink
 
         public static function GetGuidByDeviceModel(string $Model): string
         {
-            $Model = explode(' ', $Model)[0];
-            $Model = explode('(', $Model)[0];
-            if (!array_key_exists($Model, self::$DeviceModels)) {
-                return false;
+            $Match = [];
+            if (preg_match('/^[a-zA-Z]{2}\d{3}/', $Model, $Match)) {
+                if (array_key_exists($Match[0], self::$DeviceModels)) {
+                    return self::$DeviceModels[$Match[0]];
+                }
             }
-            return self::$DeviceModels[$Model];
+            return '';
         }
     }
 
@@ -515,6 +517,7 @@ namespace TpLink
         public const target_temp = 'target_temp';
         public const frost_protection_on = 'frost_protection_on';
         public const child_protection = 'child_protection';
+        public const trv_states = 'trv_states';
 
         public static $Variables = [
             self::target_temp=> [
@@ -535,6 +538,14 @@ namespace TpLink
                 IPSVarProfile  => VariableProfile::Switch,
                 HasAction      => true
             ],
+            self::trv_states=> [
+                IPSVarName     => 'State',
+                IPSVarType     => VARIABLETYPE_STRING,
+                IPSVarProfile  => '',
+                HasAction      => false,
+                ReceiveFunction=> 'TrvStateToString',
+            ],
+
         ];
     }
     /*
@@ -563,7 +574,7 @@ namespace TpLink
         public const Switch = '~Switch';
         public const HexColor = '~HexColor';
         public const UnixTimestampTime = '~UnixTimestampTime';
-        public const TargetTemperature = '~Temperature.HM';
+        public const TargetTemperature = 'Tapo.Temperature.Room';
         public const Temperature = '~Temperature';
         public const Humidity = '~Humidity';
         public const Battery = '~Battery.100';

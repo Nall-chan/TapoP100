@@ -66,6 +66,9 @@ namespace TpLink
 
         public function ApplyChanges()
         {
+            //Never delete this line!
+            parent::ApplyChanges();
+
             $this->RegisterProfileInteger(\TpLink\VariableProfile::RuntimeSeconds, '', '', ' seconds', 0, 0, 0);
             $this->SetTimerInterval(\TpLink\Timer::RequestState, 0);
             $this->SetSummary($this->ReadPropertyString(\TpLink\Property::Host));

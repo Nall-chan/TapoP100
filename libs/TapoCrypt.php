@@ -173,7 +173,6 @@ namespace TpLink\Crypt
             if ($Result === false) {
                 return '';
             }
-            $this->SendDebug('EncryptedResponse', $Result, 0);
             $json = json_decode($Result, true);
             if ($json[\TpLink\Api\ErrorCode] == 9999) {
                 // Session Timeout, try to reconnect
@@ -189,6 +188,7 @@ namespace TpLink\Crypt
                 return '';
             }
             if ($json[\TpLink\Api\ErrorCode] != 0) {
+                $this->SendDebug('Response ' . \TpLink\Api\ErrorCode, $json[\TpLink\Api\ErrorCode], 0);
                 if (array_key_exists($json[\TpLink\Api\ErrorCode], \TpLink\Api\Protocol::$ErrorCodes)) {
                     $msg = \TpLink\Api\Protocol::$ErrorCodes[$json[\TpLink\Api\ErrorCode]];
                 } else {
