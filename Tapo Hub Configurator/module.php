@@ -72,16 +72,12 @@ class TapoHubConfigurator extends IPSModule
                 ],
                 $IPSDevices
             );
-
             if ($InstanceID) {
-                IPS_GetName($InstanceID);
                 unset($IPSDevices[$InstanceID]);
-            } else {
-                $Name = base64_decode($Device[\TpLink\Api\Result::Nickname]);
             }
             $Values[] = [
                 'DeviceId'           => $Device[\TpLink\API\Result::DeviceID],
-                'name'               => $Name,
+                'name'               => ($InstanceID ? IPS_GetName($InstanceID) : base64_decode($Device[\TpLink\Api\Result::Nickname])),
                 'type'               => $Device[\TpLink\Api\Result::Type],
                 'model'              => $Device[\TpLink\Api\Result::Model],
                 'instanceID'         => ($InstanceID ? $InstanceID : 0),
