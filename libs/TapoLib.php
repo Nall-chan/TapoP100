@@ -201,7 +201,7 @@ namespace TpLink
         public static function GetGuidByDeviceModel(string $Model): string
         {
             $Match = [];
-            if (preg_match('/^[a-zA-Z]{2}\d{3}/', $Model, $Match)) {
+            if (preg_match('/^[a-zA-Z]{1,2}\d{3}/', $Model, $Match)) {
                 if (array_key_exists($Match[0], self::$DeviceModels)) {
                     return self::$DeviceModels[$Match[0]];
                 }
@@ -237,7 +237,7 @@ namespace TpLink
         public static function GetGuidByDeviceModel(string $Model): string
         {
             $Match = [];
-            if (preg_match('/^[a-zA-Z]{2}\d{3}/', $Model, $Match)) {
+            if (preg_match('/^[a-zA-Z]{1,2}\d{3}/', $Model, $Match)) {
                 if (array_key_exists($Match[0], self::$DeviceModels)) {
                     return self::$DeviceModels[$Match[0]];
                 }
