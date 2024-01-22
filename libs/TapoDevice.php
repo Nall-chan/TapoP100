@@ -221,16 +221,16 @@ namespace TpLink
                 }
             }
             foreach ($this->GetModuleIdents() as $Ident => $VarParams) {
-                if (!array_key_exists($Ident, $Values)) {
-                    if (!array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
-                        continue;
-                    }
+                if (array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
                     $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}($Values);
                     if (is_null($Values[$Ident])) {
                         continue;
                     }
+                } else {
+                    if (!array_key_exists($Ident, $Values)) {
+                        continue;
+                    }
                 }
-
                 $this->MaintainVariable(
                     $IdentPrefix . $Ident,
                     $NamePrefix . $this->Translate($VarParams[\TpLink\IPSVarName]),
