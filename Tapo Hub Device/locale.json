@@ -1,0 +1,22 @@
+{
+    "translations": {
+        "de": {
+            "tapo Hub Device": "tapo Hub Gerät",
+            "Not connected": "Nicht verbunden",
+            "Incorrect Request": "Falsche Anfrage",
+            "Invalid Protocol": "Ungültiges Protokoll",
+            "JSON formatting error": "JSON Fehler",
+            "Value out of range": "Wert außerhalb des gültigen Bereiches",
+            "Invalid ident": "Ungültiger Ident",
+            "State": "Status",
+            "Online status": "Online status",
+            "Current humidity": "Aktuelle Luftfeuchtigkeit",
+            "Current temperature": "Aktuelle Temperatur",
+            "Low battery": "Batterie schwach",
+            "Battery": "Batterie",
+            "Setpoint temperature": "Solltemperatur",
+            "Frost protection": "Frostschutz",
+            "Child Protection": "Kindersicherung"
+        }
+    }
+}

@@ -5,14 +5,14 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 
 /**
- * TapoHubIO Klasse für das anlagen von tapo hub childs.
- * Erweitert IPSModule.
+ * TapoHubIO Klasse für die Kommunikation mit einem Smart Hub.
+ * Erweitert \TpLink\Device.
  *
  * @author        Michael Tröger <micha@nall-chan.net>
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.60
+ * @version       1.65
  */
 class TapoHubIO extends \TpLink\Device
 {
@@ -38,7 +38,6 @@ class TapoHubIO extends \TpLink\Device
 
     public function RequestState()
     {
-
         $Result = $this->GetDeviceInfo(); // Eigene Vars des Hub laden und an Child senden
         if ($Result) {
             // todo eigene Daten an Hub Device senden

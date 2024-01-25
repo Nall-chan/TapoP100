@@ -1,9 +1,9 @@
 [![SDK](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.60-blue.svg)](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.65-blue.svg)](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865)
 [![Version](https://img.shields.io/badge/Symcon%20Version-6.1%20%3E-green.svg)](https://www.symcon.de/service/dokumentation/installation/migrationen/v60-v61-q1-2022/)  
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Check Style](https://github.com/Nall-chan/SSHClient/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)
-[![Run Tests](https://github.com/Nall-chan/SSHClient/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)  
+[![Check Style](https://github.com/Nall-chan/tapoSmartHome/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)
+[![Run Tests](https://github.com/Nall-chan/tapoSmartHome/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)  
 [![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)
 [![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
 
@@ -16,11 +16,14 @@ Einbindung der TP-Link tapo SmartHome Geräte
   - [1. Nicht Geräte Instanzen](#1-nicht-geräte-instanzen)
     - [tapo Discovery](#tapo-discovery)
     - [tapo Configurator](#tapo-configurator)
-    - [tapo Gateway](#tapo-gateway)
-  - [2. Geräte Instanzen](#2-geräte-instanzen)
+    - [tapo Hub IO](#tapo-hub-io)
+  - [2. Netzwerk Geräte Instanzen](#2-netzwerk-geräte-instanzen)
     - [tapo Light](#tapo-light)
+    - [tapo Light](#tapo-light-1)
     - [tapo Socket](#tapo-socket)
     - [tapo Energy Socket](#tapo-energy-socket)
+  - [3. Hub Geräte Instanzen](#3-hub-geräte-instanzen)
+    - [tapo Hub Device](#tapo-hub-device)
 - [2. Voraussetzungen](#2-voraussetzungen)
 - [3. Software-Installation](#3-software-installation)
 - [4. Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
@@ -41,22 +44,55 @@ Einbindung der TP-Link tapo SmartHome Geräte
 
 ### [tapo Configurator](Tapo%20Configurator/README.md)  
  - Einfaches Anlegen von Geräte-Instanzen welche mit einem Smart Hub verbunden sind.  
-  (geplant; [Tester gesucht -> hier melden](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865/))
   
-### [tapo Gateway](Tapo%20Gateway/README.md)  
- - Smart Hub Instanz als Bindeglied zwischen angelernten tapo Geräten und Symcon.  
+### [tapo Hub IO](Tapo%20Hub%20IO/README.md)  
+ Smart Hub Instanz als IO Instanz zur Kommunikation mit den angelernten Funk-Geräten und Symcon.  
+ Folgende Hubs werden unterstützt:  
+ - KH100
+ - H100
+ - H200
 
-## 2. Geräte Instanzen
+## 2. Netzwerk Geräte Instanzen
 
 ### [tapo Light](Tapo%20Light/README.md)  
-  *  Lampe und LED Strip  
-
+  Leuchtmittel:  
+  - L510 (E27, dimmbar)  
+  - L520 (E27, dimmbar)  
+  - L610 (GU10, dimmbar)  
+---    
+### [tapo Light](Tapo%20Light/README.md)  
+  Leuchtmittel / LED-Stripe:  
+  - L530 (E27, dimmbar, mehrfarbig)  
+  - L535 (E27, dimmbar, mehrfarbig)  
+  - L630 (GU10, dimmbar, mehrfarbig)  
+  - L900 (LED Stripe, dimmbar, mehrfarbig)
+--- 
 ### [tapo Socket](Tapo%20Socket/README.md)  
-  *  WiFi Smart Socket  
-
+  Zwischenstecker:  
+  - P100 (mini)
+  - P105 (rund)
+--- 
 ### [tapo Energy Socket](Tapo%20Energy%20Socket/README.md)  
-  *  WiFi Smart Sockets mit Energiemessung   
-  
+  Zwischenstecker mit Energiemessung:  
+  - P110 (mini)
+  - P115 (rund)
+
+  Weitere Geräte können im Modul ergänzt werden, leider liegen aktuell keine Daten für diese Geräte vor.
+  Hier melden für die integration von weiteren Geräten:  
+  **[Symcon Community](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865/)**
+
+
+## 3. Hub Geräte Instanzen
+
+### [tapo Hub Device](Tapo%20Hub%20Device/README.md)  
+  aktuell umgesetzt und getestete Geräte:  
+  - KE100 (Heizkörperthermostat)  
+  - T310 (Temperatur- & Feuchtigkeitssensor)  
+
+  Alle restlichen Geräte können im Modul ergänzt werden, leider liegen aktuell keine Daten für diese Geräte vor.
+  Hier melden für die integration von weiteren Geräten:  
+  **[Symcon Community](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865/)**
+
 # 2. Voraussetzungen
 
 - IP-Symcon ab Version 6.1
@@ -75,6 +111,11 @@ Es wird empfohlen die Einrichtung mit der Discovery-Instanz zu starten ([tapo Di
 # 5. Anhang
 
 ## 1. Changelog
+
+Version 1.65:
+ - Smart Hubs werden unterstützt.  
+ - Geräte von Smart Hubs ergänzt.  
+ - Diverse Netzwerk Geräte ergänzt.  
 
 Version 1.61:
  - P300 Steckdosenleiste ergänzt.  

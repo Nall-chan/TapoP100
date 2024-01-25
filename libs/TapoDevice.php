@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+/**
+ * TapoDevice
+ * Enthält die Basisklasse für Netzwerk-Geräte.
+ *
+ * @author        Michael Tröger <micha@nall-chan.net>
+ * @copyright     2024 Michael Tröger
+ * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+ *
+ * @version       1.65
+ */
+
 namespace {
     eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/BufferHelper.php') . '}');
     eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/DebugHelper.php') . '}');
@@ -14,7 +25,15 @@ namespace {
 namespace TpLink
 {
     /**
-     * Device
+     * Device Basisklasse für Netzwerk-Geräte.
+     * Erweitert IPSModule.
+     *
+     * @author        Michael Tröger <micha@nall-chan.net>
+     * @copyright     2024 Michael Tröger
+     * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+     *
+     * @version       1.65
+     *
      * @property string $terminalUUID
      * @property string $token
      * @property string $cookie

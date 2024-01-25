@@ -11,8 +11,10 @@
             "Incorrect Request": "Falsche Anfrage",
             "Invalid Protocol": "Ungültiges Protokoll",
             "JSON formatting error": "JSON Fehler",
+            "Rule already set": "Regel schon aktiv",
             "Value out of range": "Wert außerhalb des gültigen Bereiches",
             "Session Timeout": "Sitzung abgelaufen",
+            "Invalid ident": "Ungültiger Ident",
             "State": "Status",
             "Runtime today": "Laufzeit Heute",
             "Runtime month": "Laufzeit Monat",
@@ -29,10 +31,7 @@
             "Overheated": "Überhitzt",
             "Brightness": "Helligkeit",
             "Color temp": "Farbtemperatur",
-            "Color": "Farbe",
-            "Setpoint temperature": "Solltemperatur",
-            "Frost protection": "Frostschutz",
-            "Child Protection": "Kindersicherung"
+            "Color": "Farbe"
         }
     }
 }

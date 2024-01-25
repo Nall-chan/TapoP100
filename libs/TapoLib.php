@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+/**
+ * TapoLib
+ * Enthält Klassen welche die API und Geräte Fähigkeiten abbilden.
+ *
+ * @author        Michael Tröger <micha@nall-chan.net>
+ * @copyright     2024 Michael Tröger
+ * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+ *
+ * @version       1.65
+ */
+
 namespace TpLink\Api
 {
     const ErrorCode = 'error_code';
@@ -92,7 +103,7 @@ namespace TpLink\Api
             -1002 => 'Incorrect Request',
             -1003 => 'JSON formatting error',
             -1008 => 'Value out of range',
-            -1901 => 'Rule already set', //todo translate
+            -1901 => 'Rule already set',
             9999  => 'Session Timeout'
         ];
 

@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+/**
+ * TapoCrypt
+ * Enthält Klassen und Traits für IPSModule-Klasse zur Kommunikation mit Netzwerk-Geräten.
+ *
+ * @author        Michael Tröger <micha@nall-chan.net>
+ * @copyright     2024 Michael Tröger
+ * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
+ *
+ * @version       1.65
+ */
+
 namespace {
     $AutoLoader = new AutoLoaderTapoPHPSecLib('Crypt/Random');
     $AutoLoader->register();

@@ -13,7 +13,7 @@ require_once dirname(__DIR__) . '/libs/TapoLib.php';
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.60
+ * @version       1.65
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
  *
  */

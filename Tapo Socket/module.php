@@ -5,14 +5,14 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/libs/TapoDevice.php';
 
 /**
- * TapoSocket Klasse für die Anbindung von TP-Link tapo Smarte WiFi Sockets.
- * Erweitert IPSModule.
+ * TapoSocket Klasse für die Anbindung von WiFi Sockets.
+ * Erweitert \TpLink\Device.
  *
  * @author        Michael Tröger <micha@nall-chan.net>
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.60
+ * @version       1.65
  */
 class TapoSocket extends \TpLink\Device
 {

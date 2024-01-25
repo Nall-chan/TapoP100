@@ -19,14 +19,14 @@ namespace {
     require_once dirname(__DIR__) . '/Tapo Socket/module.php';
 
     /**
-     * TapoEnergySocket Klasse für die Anbindung von TP-Link tapo Smart Sockets mit Energiemessung.
+     * TapoEnergySocket Klasse für die Anbindung von WiFi Sockets mit Energiemessung.
      * Erweitert TapoSocket.
      *
      * @author        Michael Tröger <micha@nall-chan.net>
      * @copyright     2024 Michael Tröger
      * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
      *
-     * @version       1.60
+     * @version       1.65
      */
     class TapoEnergySocket extends TapoSocket
     {

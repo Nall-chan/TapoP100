@@ -5,14 +5,14 @@ eval('declare(strict_types=1);namespace TapoHubConfigurator {?>' . file_get_cont
 require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
- * TapoHubConfigurator Klasse für das anlagen von tapo hub childs.
+ * TapoHubConfigurator Klasse für das anlegen von Tapo Hub Devices.
  * Erweitert IPSModule.
  *
  * @author        Michael Tröger <micha@nall-chan.net>
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.60
+ * @version       1.65
  *
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
  */

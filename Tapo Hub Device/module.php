@@ -6,14 +6,14 @@ eval('declare(strict_types=1);namespace TapoHubDevice {?>' . file_get_contents(d
 require_once dirname(__DIR__) . '/libs/TapoLib.php';
 
 /**
- * TapoHubDevice Klasse für die Anbindung von TP-Link tapo Geräte welche Hubs benötigen.
+ * TapoHubDevice Klasse für die Anbindung von TP-Link tapo Geräte welche mit Hubs verbunden werden.
  * Erweitert IPSModule.
  *
  * @author        Michael Tröger <micha@nall-chan.net>
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.60
+ * @version       1.65
  *
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
  * @method void RegisterProfileFloat(string $Name, string $Icon, string $Prefix, string $Suffix, float $MinValue, float $MaxValue, float $StepSize, int $Digits)
