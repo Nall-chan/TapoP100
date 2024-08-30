@@ -100,25 +100,6 @@ class TapoStripeColor extends TapoLightColor
         parent::RequestAction($Ident, $Value);
     }
 
-    public function Test(string $Value)
-    {
-        $Request = \TpLink\Api\Protocol::BuildRequest($Value);
-        $Response = $this->SendRequest($Request);
-        if ($Response === null) {
-            return false;
-        }
-        return $Response;
-    }
-    public function Test2(string $Value, string $Value2)
-    {
-        $Request = \TpLink\Api\Protocol::BuildRequest($Value, '', json_decode($Value2, true));
-        $Response = $this->SendRequest($Request);
-        if ($Response === null) {
-            return false;
-        }
-        return $Response;
-    }
-
     /**
      * LightEffectToVariable ReceiveFunction
      *

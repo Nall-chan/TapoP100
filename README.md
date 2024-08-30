@@ -121,7 +121,7 @@ Es wird empfohlen die Einrichtung mit der Discovery-Instanz zu starten ([tapo Di
 Version 1.70:
 - tapo Stripe Color ergänzt.  
 
-Version 1.70:
+Version 1.65:
  - Smart Hubs werden unterstützt.  
  - Geräte von Smart Hubs ergänzt.  
  - Diverse Netzwerk Geräte ergänzt.  
