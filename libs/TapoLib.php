@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.65
+ * @version       1.70
  */
 
 namespace TpLink\Api
@@ -41,6 +41,7 @@ namespace TpLink\Api
         // not used (now)
         public const GetDeviceUsage = 'get_device_usage';
         public const SetLightingEffect = 'set_lighting_effect';
+        public const GetLightingEffect = 'get_lighting_effect';
 
         // not working :(
         //public const Reboot = 'reboot';
@@ -154,7 +155,9 @@ namespace TpLink\VariableIdent
     const Socket = '\TpLink\VariableIdentSocket';
     const Rssi = '\TpLink\VariableIdentRssi';
     const Light = '\TpLink\VariableIdentLight';
+    const LightColorTemp = '\TpLink\VariableIdentLightColorTemp';
     const LightColor = '\TpLink\VariableIdentLightColor';
+    const LightEffect = '\TpLink\VariableIdentLightEffect';
     const Humidity = '\TpLink\VariableIdentHumidity';
     const Online = '\TpLink\VariableIdentOnline';
     const Temp = '\TpLink\VariableIdentTemp';
@@ -204,6 +207,8 @@ namespace TpLink
             self::BulbL610    => GUID::BulbWithe,
             self::BulbL630    => GUID::BulbColor,
             self::StripeL900  => GUID::BulbColor,
+            self::StripeL920  => GUID::StripeColor,
+            self::StripeL930  => GUID::StripeColor,
             self::KH100       => GUID::HubConfigurator,
             self::H100        => GUID::HubConfigurator,
             self::H200        => GUID::HubConfigurator,
@@ -299,6 +304,7 @@ namespace TpLink
         public const PlugsMulti = '{C923F554-4621-446E-B0D2-1422F2EB84B5}';
         public const BulbColor = '{3C59DCC3-4441-4E1C-A59C-9F8D26CE2E82}';
         public const BulbWithe = '{1B9D73D6-853D-4E2E-9755-2273FD7A6123}';
+        public const StripeColor = '{DF8D96FD-9BC7-4A98-B9E2-C8B2FF92B892}';
         public const Hub = '{1EDD1EB2-6885-4D87-BA00-9328D74A85C4}';
         public const HubConfigurator = '{CA1E7005-E5D1-455C-95DF-5ECE8DC50654}';
         public const HubSendToChild = '{A982FDFB-9576-4DAE-9341-5ADCA8B05326}';
@@ -317,6 +323,7 @@ namespace TpLink
         public const AutoRename = 'AutoRename';
         public const Protocol = 'Protocol';
         public const DeviceId = 'DeviceId';
+        public const LightEffectsEnabled = 'LightEffectsEnabled';
     }
 
     class Attribute
@@ -324,6 +331,8 @@ namespace TpLink
         public const Username = 'Username';
         public const Password = 'Password';
         public const Category = 'Category';
+        public const LightEffects = 'Multi_LightEffects';
+        public const LightEffectsEnabled = 'LightEffects';
     }
 
     class Timer
@@ -331,7 +340,12 @@ namespace TpLink
         public const RequestState = 'RequestState';
     }
 
-    class VariableIdentOnOff
+    class VariableIdent
+    {
+        public static $Variables = [];
+    }
+
+    class VariableIdentOnOff extends VariableIdent
     {
         public const device_on = 'device_on';
 
@@ -345,7 +359,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentOverheated
+    class VariableIdentOverheated extends VariableIdent
     {
         public const overheated = 'overheated';
 
@@ -353,13 +367,13 @@ namespace TpLink
             self::overheated=> [
                 IPSVarName   => 'Overheated',
                 IPSVarType   => VARIABLETYPE_BOOLEAN,
-                IPSVarProfile=> '~Alert',
+                IPSVarProfile=> VariableProfile::Overheated,
                 HasAction    => false
             ]
         ];
     }
 
-    class VariableIdentSocket
+    class VariableIdentSocket extends VariableIdent
     {
         public const on_time = 'on_time';
         public const on_time_string = 'on_time_string';
@@ -398,7 +412,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentRssi
+    class VariableIdentRssi extends VariableIdent
     {
         public const rssi = 'rssi';
 
@@ -412,7 +426,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentLight
+    class VariableIdentLight extends VariableIdent
     {
         public const brightness = 'brightness';
 
@@ -425,29 +439,61 @@ namespace TpLink
             ]
         ];
     }
-
-    class VariableIdentLightColor
+    class VariableIdentLightColorTemp extends VariableIdent
     {
-        public const overheated = 'overheated';
-        public const brightness = 'brightness';
-        public const hue = 'hue';
-        public const saturation = 'saturation';
         public const color_temp = 'color_temp';
-        public const dynamic_light_effect_enable = 'dynamic_light_effect_enable';
-        public const color_rgb = 'color_rgb';
 
         public static $Variables = [
-            self::overheated=> [
-                IPSVarName   => 'Overheated',
-                IPSVarType   => VARIABLETYPE_BOOLEAN,
-                IPSVarProfile=> '~Alert',
-                HasAction    => false
-            ],
             self::color_temp=> [
                 IPSVarName   => 'Color temp',
                 IPSVarType   => VARIABLETYPE_INTEGER,
                 IPSVarProfile=> VariableProfile::ColorTemp,
                 HasAction    => true
+            ]
+        ];
+    }
+
+    class VariableIdentLightColor extends VariableIdent
+    {
+        public const hue = 'hue';
+        public const saturation = 'saturation';
+        public const dynamic_light_effect_enable = 'dynamic_light_effect_enable';
+        public const color_rgb = 'color_rgb';
+
+        public static $Variables = [
+            self::color_rgb=> [
+                IPSVarName     => 'Color',
+                IPSVarType     => VARIABLETYPE_INTEGER,
+                IPSVarProfile  => VariableProfile::HexColor,
+                HasAction      => true,
+                ReceiveFunction=> 'HSVtoRGB',
+                SendFunction   => 'RGBtoHSV'
+            ],
+        ];
+    }
+
+    class VariableIdentLightEffect extends VariableIdent
+    {
+        public const lighting_effect = 'lighting_effect';
+        public const brightness = 'brightness'; // Overwrite LightColor
+        public const color_rgb = 'color_rgb'; // Overwrite LightColor
+
+        public static $Variables = [
+            self::lighting_effect => [
+                IPSVarName              => 'Effect',
+                IPSVarType              => VARIABLETYPE_STRING,
+                IPSVarProfile           => VariableProfile::LightingEffect,
+                HasAction               => true,
+                ReceiveFunction         => 'LightEffectToVariable',
+                SendFunction            => 'ActivateLightEffect'
+            ],
+            self::brightness=> [
+                IPSVarName              => 'Brightness',
+                IPSVarType              => VARIABLETYPE_INTEGER,
+                IPSVarProfile           => VariableProfile::Brightness,
+                HasAction               => true,
+                ReceiveFunction         => 'BrightnessToVariable',
+                SendFunction            => 'SendBrightness'
             ],
             self::color_rgb=> [
                 IPSVarName     => 'Color',
@@ -460,7 +506,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentOnline
+    class VariableIdentOnline extends VariableIdent
     {
         public const status = 'status';
 
@@ -474,7 +520,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentHumidity
+    class VariableIdentHumidity extends VariableIdent
     {
         public const current_humidity = 'current_humidity';
 
@@ -488,7 +534,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentTemp
+    class VariableIdentTemp extends VariableIdent
     {
         public const current_temp = 'current_temp';
 
@@ -502,7 +548,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentBattery
+    class VariableIdentBattery extends VariableIdent
     {
         public const at_low_battery = 'at_low_battery';
         public const battery_percentage = 'battery_percentage';
@@ -523,7 +569,7 @@ namespace TpLink
         ];
     }
 
-    class VariableIdentTrv
+    class VariableIdentTrv extends VariableIdent
     {
         public const target_temp = 'target_temp';
         public const frost_protection_on = 'frost_protection_on';
@@ -582,7 +628,9 @@ namespace TpLink
         public const RuntimeSeconds = 'Tapo.RuntimeSeconds';
         public const ColorTemp = 'Tapo.ColorTemp';
         public const Brightness = 'Tapo.Brightness';
+        public const LightingEffect = 'Tapo.LightingEffect.%d';
         public const Switch = '~Switch';
+        public const Overheated = '~Alert';
         public const HexColor = '~HexColor';
         public const UnixTimestampTime = '~UnixTimestampTime';
         public const TargetTemperature = 'Tapo.Temperature.Room';

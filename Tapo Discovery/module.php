@@ -13,7 +13,7 @@ require_once dirname(__DIR__) . '/libs/TapoLib.php';
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.65
+ * @version       1.70
  * @method bool SendDebug(string $Message, mixed $Data, int $Format)
  *
  */
@@ -21,7 +21,7 @@ class TapoDiscovery extends IPSModule
 {
     use \TapoDiscovery\DebugHelper;
 
-    public const DISCOVERY_TIMEOUT = 3;
+    public const DISCOVERY_TIMEOUT = 4;
     public function Create(): void
     {
         //Never delete this line!
@@ -185,7 +185,7 @@ class TapoDiscovery extends IPSModule
                     continue;
                 }
                 $Result = $JsonReceive[\TpLink\Api\Result];
-                $DevicesData[] = $Result;
+                $DevicesData[$IPAddress] = $Result;
             } while (time() < $discoveryTimeout);
             socket_close($socket);
         } else {

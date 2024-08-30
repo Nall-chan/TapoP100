@@ -6,7 +6,7 @@
 [![Run Tests](https://github.com/Nall-chan/tapoSmartHome/workflows/Run%20Tests/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)  
 [![Spenden](https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_SM.gif)](#2-spenden)
 [![Wunschliste](https://img.shields.io/badge/Wunschliste-Amazon-ff69fb.svg)](#2-spenden)  
-# tapo Smart Multi Sockets<!-- omit in toc -->
+# tapo Stripe Color <!-- omit in toc -->
 
 ## Inhaltsverzeichnis <!-- omit in toc -->
 
@@ -27,7 +27,7 @@
 
 ## 1. Funktionsumfang
 
- - Instanz für Smarte WiFi Verlängerung
+ - Instanz für LED-Stripes mit Farben und Farbeffekten 
  
 ## 2. Voraussetzungen
 
@@ -49,55 +49,54 @@ Die entsprechenden Cloud-Zugangsdaten, die MAC-Adresse und das genutzte Protokol
 
  ### Konfigurationsseite <!-- omit in toc -->
 
-![Config](../imgs/conf_device.png)  
+![Config](imgs/config.png)  
 
 **Benutzername und Passwort sind die Cloud/App Zugangsdaten!**  
 
-| Name       | Text                           | Beschreibung                                                           |
-| ---------- | ------------------------------ | ---------------------------------------------------------------------- |
-| Open       | Aktiv                          | Verbindung zu Gerät herstellen                                         |
-| Host       | Host                           | Adresse des Gerätes                                                    |
-| Mac        | MAC Adresse                    | MAC Adresse des Gerätes (benötigt die Discovery-Instanz zur Zuordnung) |
-| Protocol   | Protokoll                      | Genutztes Kommunikationsprotokoll (AES oder KLAP)                      |
-| Username   | Benutzername                   | Benutzername für die Anmeldung (TP-Cloud Benutzername: eMail-Adresse)  |
-| Password   | Passwort                       | Passwort für die Anmeldung (TP-Cloud Passwort)                         |
-| Interval   | Leseintervall                  | Intervall der Abfrage von Status und Energiewerten (in Sekunden)       |
-| AutoRename | Instanz automatisch umbenennen | Instanz erhält den Namen, welcher in der App vergeben wurde            |
+| Name                | Text                           | Beschreibung                                                           |
+| ------------------- | ------------------------------ | ---------------------------------------------------------------------- |
+| Open                | Aktiv                          | Verbindung zu Gerät herstellen                                         |
+| Host                | Host                           | Adresse des Gerätes                                                    |
+| Mac                 | MAC Adresse                    | MAC Adresse des Gerätes (benötigt die Discovery-Instanz zur Zuordnung) |
+| Protocol            | Protokoll                      | Genutztes Kommunikationsprotokoll (AES oder KLAP)                      |
+| Username            | Benutzername                   | Benutzername für die Anmeldung (TP-Cloud Benutzername: eMail-Adresse)  |
+| Password            | Passwort                       | Passwort für die Anmeldung (TP-Cloud Passwort)                         |
+| Interval            | Leseintervall                  | Intervall der Abfrage von Status und Energiewerten (in Sekunden)       |
+| AutoRename          | Instanz automatisch umbenennen | Instanz erhält den Namen, welcher in der App vergeben wurde            |
+| LightEffectsEnabled | Lichteffekte                   | Liste welche alle bekannten Effekte enthält                            |
+
+**Lichteffekte:**
+
+Die Liste der Effekte enthält beim neu erstellen einer Instanz die bekannten Effekte, welche vor Einführung der neuen APP und den neuen Segment Effekten bekannt waren.  
+
+Wird ein Effekt über die APP gestartet, welchen die Instanz noch nicht kennt, so wird dieser Effekt mit in die Liste aufgenommen, wenn die Konfiguration geöffnet wird.
+
+Abgewählte (Aktiv aus) Einträge werden nicht in das Variablenprofil für Effekte übernommen.  
+Gelöschte Einträge werden dauerhaft entfernt, bis so ein Effekt wieder über die APP gestartet und somit neu gelernt wurde.  
 
 ## 5. Statusvariablen und Profile
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
 ### Statusvariablen
-| Ident                | Name                                   | Typ     | Profil              |
-| -------------------- | -------------------------------------- | ------- | ------------------- |
-| Pos_1_device_on      | Smarte Steckdose 1 - Status            | boolean | ~Switch             |
-| Pos_2_device_on      | Smarte Steckdose 2 - Status            | boolean | ~Switch             |
-| Pos_3_device_on      | Smarte Steckdose 3 - Status            | boolean | ~Switch             |
-| Pos_1_on_time_string | Smarte Steckdose 1 - On time           | string  |
-| Pos_2_on_time_string | Smarte Steckdose 2 - On time           | string  |
-| Pos_3_on_time_string | Smarte Steckdose 3 - On time           | string  |
-| Pos_1_on_time        | Smarte Steckdose 1 - On time (seconds) | integer | Tapo.RuntimeSeconds |
-| Pos_2_on_time        | Smarte Steckdose 2 - On time (seconds) | integer | Tapo.RuntimeSeconds |
-| Pos_3_on_time        | Smarte Steckdose 3 - On time (seconds) | integer | Tapo.RuntimeSeconds |
-| rssi                 | Rssi                                   | integer |
+| Ident           | Name       | Typ     | Profil                          |
+| --------------- | ---------- | ------- | ------------------------------- |
+| device_on       | Status     | boolean | ~Switch                         |
+| rssi            | Rssi       | integer |                                 |
+| overheated      | Überhitzt  | boolean | ~Alert                          |
+| brightness      | Helligkeit | integer | Tapo.Brightness                 |
+| color_rgb       | Farbe      | integer | ~HexColor                       |
+| lighting_effect | Effekt     | string  | Tapo.LightingEffect.<InstanzID> |
+
 
 ### Profile
-
-| Name                | Typ     | genutzt von                                |
-| ------------------- | ------- | ------------------------------------------ |
-| Tapo.RuntimeSeconds | integer | Pos_1_on_tim, Pos_2_on_time, Pos_3_on_time |
+| Name                            | Typ     | genutzt von     |
+| ------------------------------- | ------- | --------------- |
+| Tapo.Brightness                 | integer | brightness      |
+| Tapo.LightingEffect.<InstanzID> | string  | lighting_effect |
 
 ## 6. PHP-Befehlsreferenz
 
-``` php
-boolean TAPOSH_SwitchMode(integer $InstanzID, bool $State);
-```
----  
-``` php
-boolean TAPOSH_SwitchModeEx(integer $InstanzID, bool $State, integer $Delay);
-```
----  
 ``` php
 boolean TAPOSH_RequestState(integer $InstanzID);
 ```

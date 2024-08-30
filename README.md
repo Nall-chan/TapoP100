@@ -1,5 +1,5 @@
 [![SDK](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.65-blue.svg)](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.70-blue.svg)](https://community.symcon.de/t/modul-tp-link-tapo-smarthome/131865)
 [![Version](https://img.shields.io/badge/Symcon%20Version-6.1%20%3E-green.svg)](https://www.symcon.de/service/dokumentation/installation/migrationen/v60-v61-q1-2022/)  
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Check Style](https://github.com/Nall-chan/tapoSmartHome/workflows/Check%20Style/badge.svg)](https://github.com/Nall-chan/tapo-SmartHome/actions)
@@ -19,7 +19,8 @@ Einbindung der TP-Link tapo SmartHome Geräte
     - [tapo Hub IO](#tapo-hub-io)
   - [2. Netzwerk Geräte Instanzen](#2-netzwerk-geräte-instanzen)
     - [tapo Light](#tapo-light)
-    - [tapo Light](#tapo-light-1)
+    - [tapo Light Color](#tapo-light-color)
+    - [tapo Stripe Color](#tapo-stripe-color)
     - [tapo Socket](#tapo-socket)
     - [tapo Energy Socket](#tapo-energy-socket)
   - [3. Hub Geräte Instanzen](#3-hub-geräte-instanzen)
@@ -60,12 +61,17 @@ Einbindung der TP-Link tapo SmartHome Geräte
   - L520 (E27, dimmbar)  
   - L610 (GU10, dimmbar)  
 ---    
-### [tapo Light](Tapo%20Light/README.md)  
+### [tapo Light Color](Tapo%20Light%20Color/README.md)  
   Leuchtmittel / LED-Stripe:  
   - L530 (E27, dimmbar, mehrfarbig)  
   - L535 (E27, dimmbar, mehrfarbig)  
   - L630 (GU10, dimmbar, mehrfarbig)  
   - L900 (LED Stripe, dimmbar, mehrfarbig)
+--- 
+### [tapo Stripe Color](Tapo%20Stripe%20Color/README.md)  
+  Leuchtmittel / LED-Stripe:  
+  - L920 (LED Stripe, dimmbar, mehrfarbig, Segmentiert)
+  - L930 (LED Stripe, dimmbar, mehrfarbig, Segmentiert)
 --- 
 ### [tapo Socket](Tapo%20Socket/README.md)  
   Zwischenstecker:  
@@ -112,7 +118,10 @@ Es wird empfohlen die Einrichtung mit der Discovery-Instanz zu starten ([tapo Di
 
 ## 1. Changelog
 
-Version 1.65:
+Version 1.70:
+- tapo Stripe Color ergänzt.  
+
+Version 1.70:
  - Smart Hubs werden unterstützt.  
  - Geräte von Smart Hubs ergänzt.  
  - Diverse Netzwerk Geräte ergänzt.  

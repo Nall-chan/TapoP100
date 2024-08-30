@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.65
+ * @version       1.70
  */
 
 namespace {

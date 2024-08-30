@@ -12,7 +12,7 @@ require_once dirname(__DIR__) . '/libs/TapoDevice.php';
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.65
+ * @version       1.70
  */
 class TapoLightColor extends \TpLink\Device
 {
@@ -21,6 +21,7 @@ class TapoLightColor extends \TpLink\Device
         \TpLink\VariableIdent\Overheated,
         \TpLink\VariableIdent\Rssi,
         \TpLink\VariableIdent\Light,
+        \TpLink\VariableIdent\LightColorTemp,
         \TpLink\VariableIdent\LightColor
     ];
 
@@ -42,14 +43,14 @@ class TapoLightColor extends \TpLink\Device
      */
     protected function HSVtoRGB(array $Values)
     {
-        $color_temp = $Values[\TpLink\VariableIdentLightColor::color_temp];
+        $color_temp = $Values[\TpLink\VariableIdentLightColorTemp::color_temp];
         if ($color_temp > 0) {
             list($red, $green, $blue) = \TpLink\KelvinTable::ToRGB($color_temp);
             return ($red << 16) ^ ($green << 8) ^ $blue;
         }
         $hue = $Values[\TpLink\VariableIdentLightColor::hue] / 360;
         $saturation = $Values[\TpLink\VariableIdentLightColor::saturation] / 100;
-        $value = $Values[\TpLink\VariableIdentLightColor::brightness] / 100;
+        $value = $Values[\TpLink\VariableIdentLight::brightness] / 100;
         if ($saturation == 0) {
             $red = $value * 255;
             $green = $value * 255;
@@ -112,7 +113,7 @@ class TapoLightColor extends \TpLink\Device
      */
     protected function RGBtoHSV(int $RGB)
     {
-        $Values[\TpLink\VariableIdentLightColor::color_temp] = 0;
+        $Values[\TpLink\VariableIdentLightColorTemp::color_temp] = 0;
         $Values[\TpLink\VariableIdentLightColor::hue] = 0;
         $Values[\TpLink\VariableIdentLightColor::saturation] = 0;
 
@@ -127,7 +128,7 @@ class TapoLightColor extends \TpLink\Device
         $delta = $max - $min;
 
         if ($delta == 0) {
-            $Values[\TpLink\VariableIdentLightColor::brightness] = (int) ($value * 100);
+            $Values[\TpLink\VariableIdentLight::brightness] = (int) ($value * 100);
             return $Values;
         }
 
@@ -136,7 +137,7 @@ class TapoLightColor extends \TpLink\Device
         if ($max != 0) {
             $saturation = ($delta / $max);
         } else {
-            $Values[\TpLink\VariableIdentLightColor::brightness] = (int) ($value);
+            $Values[\TpLink\VariableIdentLight::brightness] = (int) ($value);
             return $Values;
         }
         if ($red == $max) {
@@ -154,7 +155,7 @@ class TapoLightColor extends \TpLink\Device
         }
         $Values[\TpLink\VariableIdentLightColor::hue] = (int) $hue;
         $Values[\TpLink\VariableIdentLightColor::saturation] = (int) ($saturation * 100);
-        $Values[\TpLink\VariableIdentLightColor::brightness] = (int) ($value * 100);
+        $Values[\TpLink\VariableIdentLight::brightness] = (int) ($value * 100);
         return $Values;
     }
 }

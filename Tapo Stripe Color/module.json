@@ -1,0 +1,12 @@
+{
+    "id": "{DF8D96FD-9BC7-4A98-B9E2-C8B2FF92B892}",
+    "name": "tapo Stripe Color",
+    "type": 3,
+    "vendor": "TP-Link",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "TAPOSH",
+    "url": "https://github.com/Nall-chan/tapoSmartHome"
+}

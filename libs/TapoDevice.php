@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @copyright     2024 Michael Tröger
  * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
  *
- * @version       1.65
+ * @version       1.70
  */
 
 namespace {
@@ -18,6 +18,7 @@ namespace {
     eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/DebugHelper.php') . '}');
     eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/SemaphoreHelper.php') . '}');
     eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/VariableProfileHelper.php') . '}');
+    eval('declare(strict_types=1);namespace Tapo {?>' . file_get_contents(__DIR__ . '/helper/AttributeArrayHelper.php') . '}');
     require_once 'TapoCrypt.php';
     require_once 'TapoLib.php';
 }
@@ -32,7 +33,7 @@ namespace TpLink
      * @copyright     2024 Michael Tröger
      * @license       https://creativecommons.org/licenses/by-nc-sa/4.0/ CC BY-NC-SA 4.0
      *
-     * @version       1.65
+     * @version       1.70
      *
      * @property string $terminalUUID
      * @property string $token
@@ -45,7 +46,12 @@ namespace TpLink
      * @property ?int $KlapSequenz
      * @property string[] $ChildIDs
      *
+     * @method void RegisterAttributeArray(string $Name, array $Value, int $Size = 0)
+     * @method array ReadAttributeArray(string $Name)
+     * @method void WriteAttributeArray(string $Name, array $Value)
      * @method void RegisterProfileInteger(string $Name, string $Icon, string $Prefix, string $Suffix, int $MinValue, int $MaxValue, float $StepSize)
+     * @method void RegisterProfileStringEx(string $Name, string $Icon, string $Prefix, string $Suffix, array $Associations)
+     * @method void UnregisterProfile(string $Name)
      * @method bool SendDebug(string $Message, mixed $Data, int $Format)
      */
     class Device extends \IPSModule
@@ -54,6 +60,7 @@ namespace TpLink
         use \Tapo\DebugHelper;
         use \Tapo\Semaphore;
         use \Tapo\VariableProfileHelper;
+        use \Tapo\AttributeArrayHelper;
         use Crypt\Klap;
         use Crypt\SecurePassthroug;
 
@@ -114,7 +121,7 @@ namespace TpLink
                 $SendIdent = implode('_', $IdentParts);
             }
 
-            $AllIdents = $this->GetModuleIdents();
+            $AllIdents = self::GetModuleIdents();
             if (array_key_exists($SendIdent, $AllIdents)) {
                 if ($AllIdents[$SendIdent][\TpLink\HasAction]) {
                     $Values[$SendIdent] = $Value;
@@ -239,7 +246,7 @@ namespace TpLink
                     $NamePrefix = base64_decode($Values[\TpLink\Api\Result::Nickname]) . ' - ';
                 }
             }
-            foreach ($this->GetModuleIdents() as $Ident => $VarParams) {
+            foreach (self::GetModuleIdents() as $Ident => $VarParams) {
                 if (array_key_exists(\TpLink\ReceiveFunction, $VarParams)) {
                     $Values[$Ident] = $this->{$VarParams[\TpLink\ReceiveFunction]}($Values);
                     if (is_null($Values[$Ident])) {
@@ -254,7 +261,7 @@ namespace TpLink
                     $IdentPrefix . $Ident,
                     $NamePrefix . $this->Translate($VarParams[\TpLink\IPSVarName]),
                     $VarParams[\TpLink\IPSVarType],
-                    $VarParams[\TpLink\IPSVarProfile],
+                    sprintf($VarParams[\TpLink\IPSVarProfile], $this->InstanceID),
                     0,
                     true
                 );
@@ -286,21 +293,31 @@ namespace TpLink
             if (array_key_exists(\TpLink\api\Result::DeviceID, $Values)) {
                 $SendValues[\TpLink\api\Result::DeviceID] = $Values[\TpLink\api\Result::DeviceID];
             }
-            $AllIdents = $this->GetModuleIdents();
+            $AllIdents = self::GetModuleIdents();
+            $NoError = false;
             foreach ($Values as $Ident => $Value) {
                 if (!array_key_exists($Ident, $AllIdents)) {
                     continue;
                 }
                 if (array_key_exists(\TpLink\SendFunction, $AllIdents[$Ident])) {
-                    $SendValues = array_merge($SendValues, $this->{$AllIdents[$Ident][\TpLink\SendFunction]}($Value));
+                    $ConvertResult = $this->{$AllIdents[$Ident][\TpLink\SendFunction]}($Value);
+                    if (is_bool($ConvertResult)) {
+                        $NoError = true;
+                    } else {
+                        if (count($ConvertResult)) {
+                            $SendValues = array_merge($SendValues, $ConvertResult);
+                        }
+                    }
                     continue;
                 }
                 $SendValues[$Ident] = $Value;
             }
             if (!count($SendValues)) {
-                set_error_handler([$this, 'ModulErrorHandler']);
-                trigger_error($this->Translate('Invalid ident'), E_USER_NOTICE);
-                restore_error_handler();
+                if (!$NoError) {
+                    set_error_handler([$this, 'ModulErrorHandler']);
+                    trigger_error($this->Translate('Invalid ident'), E_USER_NOTICE);
+                    restore_error_handler();
+                }
                 return false;
             }
             return $this->SetDeviceInfo($SendValues);
@@ -433,7 +450,7 @@ namespace TpLink
             return true;
         }
 
-        private function GetModuleIdents()
+        private static function GetModuleIdents()
         {
             $AllIdents = [];
             foreach (static::$ModuleIdents as $VariableIdentClassName) {

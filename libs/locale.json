@@ -31,7 +31,23 @@
             "Overheated": "Überhitzt",
             "Brightness": "Helligkeit",
             "Color temp": "Farbtemperatur",
-            "Color": "Farbe"
+            "Color": "Farbe",
+            "Effect": "Effekt",
+            "Bubbling Cauldron": "Sprudelnder Kessel",
+            "Candy Cane": "Zuckerstange",
+            "Christmas": "Weihnachten",
+            "Flicker": "Flimmern",
+            "Grandma's Christmas Lights": "Omas Weihnachtslichter",
+            "Haunted Mansion": "Geisterhaus",
+            "Icicle": "Eiszapfen",
+            "Lightning": "Blitz",
+            "Ocean": "Ozean",
+            "Rainbow": "Regenbogen",
+            "Raindrop": "Regentropfen",
+            "Spring": "Frühling",
+            "Sunrise": "Sonnenaufgang",
+            "Sonnenuntergang": "Sunset",
+            "Valentines": "Valentinstag"
         }
     }
 }
