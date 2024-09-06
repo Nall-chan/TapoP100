@@ -8,6 +8,8 @@
             "JSON formatting error": "JSON Fehler",
             "Value out of range": "Wert außerhalb des gültigen Bereiches",
             "Invalid ident": "Ungültiger Ident",
+            "Device ID": "Geräte ID",
+            "Auto rename instance": "Instanz automatisch umbenennen",
             "State": "Status",
             "Online status": "Online status",
             "Current humidity": "Aktuelle Luftfeuchtigkeit",
@@ -16,7 +18,8 @@
             "Battery": "Batterie",
             "Setpoint temperature": "Solltemperatur",
             "Frost protection": "Frostschutz",
-            "Child Protection": "Kindersicherung"
+            "Child Protection": "Kindersicherung",
+            "This module is free for non-commercial use,\r\nDonations in support of the author are accepted here:": "Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos,\r\nSchenkungen als Unterstützung für den Autor werden hier akzeptiert:"
         }
     }
 }
